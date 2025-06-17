@@ -1,33 +1,19 @@
 
+/* App.css - Todo List Application with Lavender, Soft Green, and Muted Yellow Palette */
 
 /* Color Variables */
 :root {
-  /* Lavender colors */
   --lavender-light: #e6e6fa;
   --lavender-main: #9370db;
   --lavender-dark: #7b68ee;
-
-  /* Beige colors */
-  --beige-light: #f5f5dc;
-  --beige-main: #e8e4c9;
-  --beige-dark: #d6ceb3;
-
-  /* Gray colors */
-  --gray-light: #d3d3d3;
-  --gray-main: #a9a9a9;
-  --gray-dark: #808080;
-
-  /* Taupe colors */
-  --taupe-light: #b9a89b;
-  --taupe-main: #8b7d6b;
-  --taupe-dark: #483c32;
-
-  /* Cream */
-  --cream: #fffdd0;
-
-  /* Text and utility colors */
+  --green-light: #e0f0e3;
+  --green-main: #a8d5ba;
+  --green-dark: #7fb992;
+  --yellow-light: #fff8dc;
+  --yellow-main: #f5e7b8;
+  --yellow-dark: #e6d690;
   --text-dark: #333333;
-  --text-light: #ffffff; /* White */
+  --text-light: #ffffff;
   --shadow: rgba(0, 0, 0, 0.1);
 }
 
@@ -40,7 +26,7 @@
 }
 
 body {
-  background: linear-gradient(135deg, var(--lavender-light) 0%, var(--cream) 100%);
+  background: linear-gradient(135deg, var(--lavender-light) 0%, var(--green-light) 100%);
   min-height: 100vh;
   padding: 2rem;
 }
@@ -76,18 +62,18 @@ body {
 .todo-input {
   flex-grow: 1;
   padding: 0.8rem 1.2rem;
-  border: 2px solid var(--beige-light);
+  border: 2px solid var(--green-light);
   border-radius: 8px;
   font-size: 1rem;
   color: var(--text-dark);
-  background-color: var(--beige-light);
+  background-color: var(--green-light);
   transition: all 0.3s ease;
 }
 
 .todo-input:focus {
   outline: none;
-  border-color: var(--beige-main);
-  box-shadow: 0 0 0 3px rgba(232, 228, 201, 0.3);
+  border-color: var(--green-main);
+  box-shadow: 0 0 0 3px rgba(168, 213, 186, 0.3);
 }
 
 .todo-btn {
@@ -112,7 +98,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: var(--cream);
+  background-color: var(--yellow-light);
   padding: 1rem 1.5rem;
   border-radius: 8px;
   margin-bottom: 1rem;
@@ -125,7 +111,7 @@ body {
 }
 
 .todo-item.completed {
-  background-color: var(--gray-light);
+  background-color: var(--green-light);
   opacity: 0.8;
 }
 
@@ -170,11 +156,11 @@ body {
 }
 
 .todo-action-btn.edit {
-  color: var(--taupe-dark);
+  color: var(--green-dark);
 }
 
 .todo-action-btn.edit:hover {
-  color: var(--taupe-main);
+  color: var(--green-main);
 }
 
 /* Edit Form Styles */
@@ -186,21 +172,21 @@ body {
 .edit-input {
   flex-grow: 1;
   padding: 0.8rem 1.2rem;
-  border: 2px solid var(--beige-main);
+  border: 2px solid var(--yellow-main);
   border-radius: 8px;
   font-size: 1rem;
   color: var(--text-dark);
-  background-color: var(--beige-light);
+  background-color: var(--yellow-light);
 }
 
 .edit-input:focus {
   outline: none;
-  border-color: var(--beige-dark);
-  box-shadow: 0 0 0 3px rgba(214, 206, 179, 0.3);
+  border-color: var(--yellow-dark);
+  box-shadow: 0 0 0 3px rgba(230, 214, 144, 0.3);
 }
 
 .edit-btn {
-  background-color: var(--taupe-main);
+  background-color: var(--green-main);
   color: var(--text-light);
   border: none;
   border-radius: 8px;
@@ -213,13 +199,13 @@ body {
 }
 
 .edit-btn:hover {
-  background-color: var(--taupe-dark);
+  background-color: var(--green-dark);
 }
 
 /* Empty State */
 .empty-state {
   padding: 2rem;
-  color: var(--taupe-main);
+  color: var(--lavender-main);
   font-size: 1.2rem;
   font-style: italic;
 }
