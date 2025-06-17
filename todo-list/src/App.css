@@ -1,4 +1,4 @@
-/* App.css - Todo List Application with Lavender, White, Beige, Gray, Taupe, and Cream Palette */
+
 
 /* Color Variables */
 :root {
@@ -51,7 +51,6 @@ body {
   margin: 0 auto;
 }
 
-/* Todo Wrapper Styles */
 .todo-wrapper {
   background-color: var(--text-light);
   border-radius: 15px;
@@ -68,7 +67,6 @@ body {
   font-weight: 600;
 }
 
-/* Todo Form Styles */
 .todo-form {
   display: flex;
   justify-content: space-between;
@@ -110,7 +108,6 @@ body {
   transform: translateY(-2px);
 }
 
-/* Todo Item Styles */
 .todo-item {
   display: flex;
   justify-content: space-between;
@@ -145,7 +142,6 @@ body {
   color: var(--text-dark);
 }
 
-/* Todo Actions */
 .todo-actions {
   display: flex;
   gap: 0.5rem;
