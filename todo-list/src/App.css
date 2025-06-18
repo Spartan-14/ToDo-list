@@ -24,7 +24,7 @@
 }
 
 body {
-  background: linear-gradient(135deg, var(--lavender-light) 0%, var(--green-light) 100%);
+  background-color: #EE82EE;
   min-height: 100vh;
   padding: 2rem;
 }
@@ -35,23 +35,28 @@ body {
   margin: 0 auto;
 }
 
-.todo-wrapper {
-  background-color: var(--text-light);
+.todo-wrapper, .ToDoWrapper {
+  background-color: #BA55D3;
+  border: 1px solid #D8BFD8;
   border-radius: 15px;
-  box-shadow: 0 10px 30px var(--shadow);
   padding: 2rem;
   margin-top: 2rem;
   overflow: hidden;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-.todo-wrapper h1 {
-  color: var(--lavender-dark);
+.todo-wrapper h1, .ToDoWrapper h1 {
+  color: white;
   margin-bottom: 1.5rem;
   font-size: 2.2rem;
   font-weight: 600;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #D8BFD8;
 }
 
-.todo-form {
+.todo-form, .ToDoForm {
   display: flex;
   justify-content: space-between;
   margin-bottom: 2rem;
@@ -60,23 +65,23 @@ body {
 .todo-input {
   flex-grow: 1;
   padding: 0.8rem 1.2rem;
-  border: 2px solid var(--green-light);
+  border: 2px solid #DDA0DD;
   border-radius: 8px;
   font-size: 1rem;
-  color: var(--text-dark);
-  background-color: var(--green-light);
+  color: #333333;
+  background-color: #DDA0DD;
   transition: all 0.3s ease;
 }
 
 .todo-input:focus {
   outline: none;
-  border-color: var(--green-main);
-  box-shadow: 0 0 0 3px rgba(168, 213, 186, 0.3);
+  border-color: #C8A2C8;
+  box-shadow: 0 0 0 3px rgba(221, 160, 221, 0.3);
 }
 
 .todo-btn {
-  background-color: var(--lavender-main);
-  color: var(--text-light);
+  background-color: #9370DB;
+  color: white;
   border: none;
   border-radius: 8px;
   padding: 0.8rem 1.5rem;
@@ -88,34 +93,35 @@ body {
 }
 
 .todo-btn:hover {
-  background-color: var(--lavender-dark);
+  background-color: #8A2BE2;
   transform: translateY(-2px);
 }
 
-.todo-item {
+.todo-item, .Todo {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: var(--yellow-light);
-  padding: 1rem 1.5rem;
+  background-color: #DDA0DD;
+  padding: 1.2rem 1.5rem;
   border-radius: 8px;
   margin-bottom: 1rem;
   transition: all 0.3s ease;
+  font-size: 1.2rem;
 }
 
-.todo-item:hover {
+.todo-item:hover, .Todo:hover {
   transform: translateY(-3px);
-  box-shadow: 0 5px 15px var(--shadow);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
-.todo-item.completed {
-  background-color: var(--green-light);
+.todo-item.completed, .Todo.completed {
+  background-color: #C8A2C8;
   opacity: 0.8;
 }
 
-.todo-item.completed p {
+.todo-item.completed p, .Todo.completed p {
   text-decoration: line-through;
-  color: var(--text-dark);
+  color: #333333;
   opacity: 0.7;
 }
 
@@ -123,7 +129,14 @@ body {
   flex-grow: 1;
   text-align: left;
   font-size: 1.1rem;
-  color: var(--text-dark);
+  color: #333333;
+}
+
+.Todo p {
+  flex-grow: 1;
+  text-align: left;
+  font-size: 1.1rem;
+  color: #333333;
 }
 
 .todo-actions {
@@ -162,7 +175,7 @@ body {
 }
 
 /* Edit Form Styles */
-.edit-form {
+.edit-form, .ToDoForm {
   display: flex;
   margin-bottom: 1rem;
 }
@@ -170,22 +183,22 @@ body {
 .edit-input {
   flex-grow: 1;
   padding: 0.8rem 1.2rem;
-  border: 2px solid var(--yellow-main);
+  border: 2px solid #DDA0DD;
   border-radius: 8px;
   font-size: 1rem;
-  color: var(--text-dark);
-  background-color: var(--yellow-light);
+  color: #333333;
+  background-color: #DDA0DD;
 }
 
 .edit-input:focus {
   outline: none;
-  border-color: var(--yellow-dark);
-  box-shadow: 0 0 0 3px rgba(230, 214, 144, 0.3);
+  border-color: #C8A2C8;
+  box-shadow: 0 0 0 3px rgba(221, 160, 221, 0.3);
 }
 
 .edit-btn {
-  background-color: var(--green-main);
-  color: var(--text-light);
+  background-color: #9370DB;
+  color: white;
   border: none;
   border-radius: 8px;
   padding: 0.8rem 1.5rem;
@@ -197,13 +210,13 @@ body {
 }
 
 .edit-btn:hover {
-  background-color: var(--green-dark);
+  background-color: #8A2BE2;
 }
 
 /* Empty State */
 .empty-state {
   padding: 2rem;
-  color: var(--lavender-main);
+  color: white;
   font-size: 1.2rem;
   font-style: italic;
 }
