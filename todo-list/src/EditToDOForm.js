@@ -30,3 +30,4 @@ export const EditToDoForm = ({ task }) => {
         </form>
     )
 }
+export default EditToDoForm;

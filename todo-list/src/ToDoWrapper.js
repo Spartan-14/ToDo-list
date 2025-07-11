@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux"
-import { ToDoForm } from "./ToDoForm"
+import  ToDoForm from "./ToDoForm"
 import Todo from "./Todo"
-import { EditToDoForm } from "./EditToDoForm"
+import EditToDoForm from "./EditToDOForm";
 
 export const ToDoWrapper = () => {
     const todos = useSelector((state) => state.todos.items)
@@ -16,4 +16,5 @@ export const ToDoWrapper = () => {
         </div>
     )
 }
+export default ToDoWrapper;
 
