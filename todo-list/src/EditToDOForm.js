@@ -20,7 +20,7 @@ export const EditToDoForm = ({ task }) => {
             <input
                 type="text"
                 className="todo-input"
-                value={'value'}
+                value={value}
                 placeholder="Update task"
                 onChange={(e) => setValue(e.target.value)}
             />
@@ -30,4 +30,4 @@ export const EditToDoForm = ({ task }) => {
         </form>
     )
 }
-export default EditToDoForm;
+export default EditToDoForm

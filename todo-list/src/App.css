@@ -65,7 +65,6 @@
   margin: 0;
   flex: 1;
   text-align: left;
-  cursor: pointer;
   font-size: 16px;
 }
 
@@ -79,12 +78,29 @@
   color: #333;
 }
 
+.complete-icon,
 .edit-icon,
 .delete-icon {
   margin-left: 10px;
   cursor: pointer;
   font-size: 18px;
   padding: 5px;
+}
+
+.complete-icon.incomplete-btn {
+  color: #4caf50;
+}
+
+.complete-icon.incomplete-btn:hover {
+  color: #45a049;
+}
+
+.complete-icon.completed-btn {
+  color: #ff9800;
+}
+
+.complete-icon.completed-btn:hover {
+  color: #f57c00;
 }
 
 .edit-icon {
