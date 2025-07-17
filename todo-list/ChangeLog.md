@@ -2,6 +2,42 @@
 
 This ChangeLog provides a comprehensive, up-to-date summary of the architecture, features, and all significant modifications of the todo-list React app (as of 2023-07-14). Any advanced AI can use this file to fully understand and extend the app.
 
+## [2025-07-17] Recent Updates & Enhancements
+
+- **Debug/Test Utilities:**
+  - Added `src/debug/testSupabase.js` for comprehensive Supabase API testing (connection, CRUD ops, browser-callable via `window.runSupabaseTests`).
+
+- **Redux Toolkit Integration:**
+  - Refactored `todoSlice.js` to:
+    - Use a more robust async thunk structure with better error handling and logging.
+    - Dispatch `fetchTodos()` after all mutations (add, update, delete, toggle, edit) to keep UI in sync with backend.
+    - Add `initialized` state for better first-load UX.
+    - Improve error propagation and display (Redux error state, UI error banner with dismiss).
+    - Add extensive debug logging for all async actions and reducers.
+
+- **Supabase API Layer:**
+  - Refactored `todoApi.js` to:
+    - Add detailed logging for each API operation.
+    - Throw errors for all failed operations (handled in Redux thunks).
+    - Transform fetched data to match app state shape.
+    - Ensure all CRUD and helper functions (`getTodos`, `addTodo`, `updateTodo`, `deleteTodo`, `toggleComplete`, `setEditMode`) are robust and return expected results.
+
+- **UI/UX Improvements:**
+  - Enhanced `ToDoForm.js` and `ToDoWrapper.js`:
+    - Added debug logging for form events and state changes.
+    - Improved loading indicators for both initial load and in-operation states.
+    - Added stats display (total todos, completed count).
+    - Improved empty state and error feedback for better user experience.
+    - Updated form and wrapper CSS classes for consistency.
+
+- **General:**
+  - All major actions now log to the console for easier debugging and future AI troubleshooting.
+  - Code now uses modern React best practices (functional components, hooks, modular structure).
+
+---
+
+This ChangeLog now reflects all modifications up to 2025-07-17. All new features, bug fixes, and refactors are documented above. For any future enhancements, see the debug logs and follow the modular structure for easy extension.
+
 ## Project Overview
 - **Type:** Todo List Application
 - **Framework:** React 19 (bootstrapped with Create React App)

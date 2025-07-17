@@ -14,10 +14,10 @@ export const fetchTodos = createAsyncThunk("todos/fetchTodos", async (_, { rejec
     }
 })
 
-export const addTodoAsync = createAsyncThunk("todos/addTodo", async (task, { dispatch, rejectWithValue }) => {
+export const addTodoAsync = createAsyncThunk("todos/addTodo", async (todoData, { dispatch, rejectWithValue }) => {
     try {
-        console.log("🔄 Redux: Adding todo:", task)
-        const newTodo = await todoApi.addTodo(task)
+        console.log("🔄 Redux: Adding todo:", todoData)
+        const newTodo = await todoApi.addTodo(todoData)
         console.log("✅ Redux: Todo added successfully:", newTodo)
 
         // Fetch updated todos list after adding
@@ -52,10 +52,14 @@ export const toggleCompleteAsync = createAsyncThunk(
 
 export const updateTodoAsync = createAsyncThunk(
     "todos/updateTodo",
-    async ({ id, task }, { dispatch, rejectWithValue }) => {
+    async ({ id, task, priority }, { dispatch, rejectWithValue }) => {
         try {
-            console.log("🔄 Redux: Updating todo:", id, task)
-            const updatedTodo = await todoApi.updateTodo(id, { task, is_editing: false })
+            console.log("🔄 Redux: Updating todo:", id, { task, priority })
+            const updatedTodo = await todoApi.updateTodo(id, {
+                task,
+                priority: priority || null,
+                is_editing: false,
+            })
             console.log("✅ Redux: Update todo successful:", updatedTodo)
 
             // Fetch updated todos list
@@ -120,19 +124,19 @@ const todoSlice = createSlice({
         builder
             // Fetch todos
             .addCase(fetchTodos.pending, (state) => {
-                console.log(" Redux: Fetch todos pending...")
+                console.log("🔄 Redux: Fetch todos pending...")
                 state.loading = true
                 state.error = null
             })
             .addCase(fetchTodos.fulfilled, (state, action) => {
-                console.log(" Redux: Fetch todos fulfilled:", action.payload)
+                console.log("✅ Redux: Fetch todos fulfilled:", action.payload)
                 state.loading = false
                 state.todos = action.payload
                 state.initialized = true
                 state.error = null
             })
             .addCase(fetchTodos.rejected, (state, action) => {
-                console.error(" Redux: Fetch todos rejected:", action.payload)
+                console.error("❌ Redux: Fetch todos rejected:", action.payload)
                 state.loading = false
                 state.error = action.payload
                 state.initialized = true
@@ -140,17 +144,17 @@ const todoSlice = createSlice({
 
             // Add todo
             .addCase(addTodoAsync.pending, (state) => {
-                console.log(" Redux: Add todo pending...")
+                console.log("🔄 Redux: Add todo pending...")
                 state.loading = true
                 state.error = null
             })
             .addCase(addTodoAsync.fulfilled, (state) => {
-                console.log(" Redux: Add todo fulfilled - todos will be refreshed by fetchTodos")
+                console.log("✅ Redux: Add todo fulfilled - todos will be refreshed by fetchTodos")
                 state.loading = false
                 state.error = null
             })
             .addCase(addTodoAsync.rejected, (state, action) => {
-                console.error(" Redux: Add todo rejected:", action.payload)
+                console.error("❌ Redux: Add todo rejected:", action.payload)
                 state.loading = false
                 state.error = action.payload
             })
@@ -160,11 +164,11 @@ const todoSlice = createSlice({
                 state.error = null
             })
             .addCase(toggleCompleteAsync.fulfilled, (state) => {
-                console.log(" Redux: Toggle complete fulfilled - todos refreshed")
+                console.log("✅ Redux: Toggle complete fulfilled - todos refreshed")
                 state.error = null
             })
             .addCase(toggleCompleteAsync.rejected, (state, action) => {
-                console.error(" Redux: Toggle complete rejected:", action.payload)
+                console.error("❌ Redux: Toggle complete rejected:", action.payload)
                 state.error = action.payload
             })
 
@@ -173,11 +177,11 @@ const todoSlice = createSlice({
                 state.error = null
             })
             .addCase(updateTodoAsync.fulfilled, (state) => {
-                console.log(" Redux: Update todo fulfilled - todos refreshed")
+                console.log("✅ Redux: Update todo fulfilled - todos refreshed")
                 state.error = null
             })
             .addCase(updateTodoAsync.rejected, (state, action) => {
-                console.error(" Redux: Update todo rejected:", action.payload)
+                console.error("❌ Redux: Update todo rejected:", action.payload)
                 state.error = action.payload
             })
 
@@ -186,11 +190,11 @@ const todoSlice = createSlice({
                 state.error = null
             })
             .addCase(deleteTodoAsync.fulfilled, (state) => {
-                console.log(" Redux: Delete todo fulfilled - todos refreshed")
+                console.log("✅ Redux: Delete todo fulfilled - todos refreshed")
                 state.error = null
             })
             .addCase(deleteTodoAsync.rejected, (state, action) => {
-                console.error(" Redux: Delete todo rejected:", action.payload)
+                console.error("❌ Redux: Delete todo rejected:", action.payload)
                 state.error = action.payload
             })
 
@@ -199,11 +203,11 @@ const todoSlice = createSlice({
                 state.error = null
             })
             .addCase(editTodoAsync.fulfilled, (state) => {
-                console.log(" Redux: Edit todo fulfilled - todos refreshed")
+                console.log("✅ Redux: Edit todo fulfilled - todos refreshed")
                 state.error = null
             })
             .addCase(editTodoAsync.rejected, (state, action) => {
-                console.error(" Redux: Edit todo rejected:", action.payload)
+                console.error("❌ Redux: Edit todo rejected:", action.payload)
                 state.error = action.payload
             })
     },
