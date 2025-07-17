@@ -3,30 +3,19 @@
 import { useEffect } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import ToDoForm from "./ToDoForm"
-import Todo from "./Todo"
-import EditToDOForm from "./EditToDOForm"
+import SortingControls from "./components/SortingControls"
+import TodoGroup from "./components/TodoGroup"
 import { fetchTodos, clearError } from "./store/todoSlice"
 
 const ToDoWrapper = () => {
     const dispatch = useDispatch()
-    const { todos, loading, error, initialized } = useSelector((state) => state.todos)
+    const { todos, processedTodos, loading, error, initialized, groupBy } = useSelector((state) => state.todos)
 
     // Fetch todos when component mounts
     useEffect(() => {
         console.log("🚀 ToDoWrapper: Component mounted, fetching todos...")
         dispatch(fetchTodos())
     }, [dispatch])
-
-    // Debug logging (console only, no UI)
-    useEffect(() => {
-        console.log("📊 ToDoWrapper: State updated:", {
-            todosCount: todos.length,
-            loading,
-            error,
-            initialized,
-            todos: todos.slice(0, 2), // Log first 2 todos for debugging
-        })
-    }, [todos, loading, error, initialized])
 
     const handleClearError = () => {
         dispatch(clearError())
@@ -50,6 +39,18 @@ const ToDoWrapper = () => {
                 </div>
             </div>
         )
+    }
+
+    const renderTodos = () => {
+        if (groupBy === "none") {
+            // Render as flat list
+            return <TodoGroup groupName="All Tasks" todos={processedTodos} isGrouped={false} />
+        } else {
+            // Render as grouped
+            return Object.entries(processedTodos).map(([groupName, groupTodos]) => (
+                <TodoGroup key={groupName} groupName={groupName} todos={groupTodos} isGrouped={true} />
+            ))
+        }
     }
 
     return (
@@ -92,6 +93,9 @@ const ToDoWrapper = () => {
             {/* Add Todo Form */}
             <ToDoForm />
 
+            {/* Sorting and Grouping Controls */}
+            <SortingControls />
+
             {/* Loading indicator for operations */}
             {loading && initialized && (
                 <div className="operation-loading">
@@ -106,9 +110,7 @@ const ToDoWrapper = () => {
                         <p>📝 No tasks yet. Add one above to get started!</p>
                     </div>
                 ) : (
-                    todos.map((todo) =>
-                        todo.is_editing ? <EditToDOForm task={todo} key={todo.id} /> : <Todo task={todo} key={todo.id} />,
-                    )
+                    renderTodos()
                 )}
             </div>
         </div>

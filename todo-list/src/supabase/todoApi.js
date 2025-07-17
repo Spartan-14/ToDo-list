@@ -1,15 +1,11 @@
 import { supabase } from "./client"
 
-// Get all todos with priority-based sorting
+// Get all todos
 export const getTodos = async () => {
     try {
         console.log("🔄 API: Fetching todos from Supabase...")
 
-        const { data, error } = await supabase
-            .from("todos")
-            .select("*")
-            .order("priority", { ascending: true, nullsLast: true }) // Priority 1, 2, 3, then null
-            .order("created_at", { ascending: false }) // Then by newest first
+        const { data, error } = await supabase.from("todos").select("*").order("created_at", { ascending: false })
 
         if (error) {
             console.error("❌ API: Fetch todos error:", error)
@@ -24,8 +20,9 @@ export const getTodos = async () => {
             task: todo.task,
             completed: todo.completed,
             is_editing: todo.is_editing,
-            priority: todo.priority, // null, 1, 2, or 3
+            priority: todo.priority,
             created_at: todo.created_at,
+            updated_at: todo.updated_at,
         }))
 
         console.log("✅ API: Transformed todos:", transformedTodos)
@@ -41,6 +38,8 @@ export const addTodo = async (todoData) => {
     try {
         console.log("🔄 API: Adding todo:", todoData)
 
+        const now = new Date().toISOString()
+
         const { data, error } = await supabase
             .from("todos")
             .insert([
@@ -48,7 +47,8 @@ export const addTodo = async (todoData) => {
                     task: todoData.task,
                     completed: false,
                     is_editing: false,
-                    priority: todoData.priority || null, // Handle priority
+                    priority: todoData.priority || null,
+                    updated_at: now,
                 },
             ])
             .select()
@@ -66,12 +66,17 @@ export const addTodo = async (todoData) => {
     }
 }
 
-// Update todo (including priority)
+// Update todo (including priority and updated_at)
 export const updateTodo = async (id, updates) => {
     try {
         console.log("🔄 API: Updating todo:", id, updates)
 
-        const { data, error } = await supabase.from("todos").update(updates).eq("id", id).select()
+        const updatesWithTimestamp = {
+            ...updates,
+            updated_at: new Date().toISOString(),
+        }
+
+        const { data, error } = await supabase.from("todos").update(updatesWithTimestamp).eq("id", id).select()
 
         if (error) {
             console.error("❌ API: Update todo error:", error)

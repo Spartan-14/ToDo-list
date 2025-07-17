@@ -1,13 +1,101 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
 import * as todoApi from "../supabase/todoApi"
 
+// Sorting and grouping utilities
+const sortTodos = (todos, sortBy, sortOrder, groupBy) => {
+    const sortedTodos = [...todos]
+
+    // Primary sorting function
+    const getSortValue = (todo, criteria) => {
+        switch (criteria) {
+            case "dateCreated":
+                return new Date(todo.created_at).getTime()
+            case "dateModified":
+                return todo.updated_at ? new Date(todo.updated_at).getTime() : new Date(todo.created_at).getTime()
+            case "name":
+                return todo.task.toLowerCase()
+            case "priority":
+                // Priority sorting: 1 (urgent) first, then 2, 3, then null last
+                return todo.priority === null ? 999 : todo.priority
+            default:
+                return 0
+        }
+    }
+
+    // Sort the todos
+    sortedTodos.sort((a, b) => {
+        const aValue = getSortValue(a, sortBy)
+        const bValue = getSortValue(b, sortBy)
+
+        let comparison = 0
+        if (aValue < bValue) comparison = -1
+        if (aValue > bValue) comparison = 1
+
+        return sortOrder === "desc" ? -comparison : comparison
+    })
+
+    // Group the todos if groupBy is specified
+    if (groupBy && groupBy !== "none") {
+        const grouped = {}
+
+        sortedTodos.forEach((todo) => {
+            let groupKey
+
+            switch (groupBy) {
+                case "dateCreated":
+                    groupKey = new Date(todo.created_at).toDateString()
+                    break
+                case "dateModified":
+                    const modDate = todo.updated_at ? new Date(todo.updated_at) : new Date(todo.created_at)
+                    groupKey = modDate.toDateString()
+                    break
+                case "name":
+                    groupKey = todo.task.charAt(0).toUpperCase()
+                    break
+                case "priority":
+                    switch (todo.priority) {
+                        case 1:
+                            groupKey = "🔴 Urgent"
+                            break
+                        case 2:
+                            groupKey = "🟡 Higher Priority"
+                            break
+                        case 3:
+                            groupKey = "🟢 Normal Priority"
+                            break
+                        default:
+                            groupKey = "⚪ No Priority"
+                            break
+                    }
+                    break
+                default:
+                    groupKey = "All Tasks"
+            }
+
+            if (!grouped[groupKey]) {
+                grouped[groupKey] = []
+            }
+            grouped[groupKey].push(todo)
+        })
+
+        return grouped
+    }
+
+    return sortedTodos
+}
+
 // Async thunks for Supabase operations
-export const fetchTodos = createAsyncThunk("todos/fetchTodos", async (_, { rejectWithValue }) => {
+export const fetchTodos = createAsyncThunk("todos/fetchTodos", async (_, { getState, rejectWithValue }) => {
     try {
         console.log("🔄 Redux: Fetching todos from Supabase...")
         const todos = await todoApi.getTodos()
         console.log("✅ Redux: Todos fetched successfully:", todos)
-        return todos
+
+        // Apply current sorting and grouping
+        const { sortBy, sortOrder, groupBy } = getState().todos
+        const processedTodos = sortTodos(todos, sortBy, sortOrder, groupBy)
+
+        return { todos, processedTodos }
     } catch (error) {
         console.error("❌ Redux: Fetch todos failed:", error.message)
         return rejectWithValue(error.message)
@@ -21,9 +109,7 @@ export const addTodoAsync = createAsyncThunk("todos/addTodo", async (todoData, {
         console.log("✅ Redux: Todo added successfully:", newTodo)
 
         // Fetch updated todos list after adding
-        console.log("🔄 Redux: Fetching updated todos list...")
         dispatch(fetchTodos())
-
         return newTodo
     } catch (error) {
         console.error("❌ Redux: Add todo failed:", error.message)
@@ -39,9 +125,7 @@ export const toggleCompleteAsync = createAsyncThunk(
             const updatedTodo = await todoApi.toggleComplete(id, completed)
             console.log("✅ Redux: Toggle complete successful:", updatedTodo)
 
-            // Fetch updated todos list
             dispatch(fetchTodos())
-
             return updatedTodo
         } catch (error) {
             console.error("❌ Redux: Toggle complete failed:", error.message)
@@ -59,12 +143,11 @@ export const updateTodoAsync = createAsyncThunk(
                 task,
                 priority: priority || null,
                 is_editing: false,
+                updated_at: new Date().toISOString(),
             })
             console.log("✅ Redux: Update todo successful:", updatedTodo)
 
-            // Fetch updated todos list
             dispatch(fetchTodos())
-
             return updatedTodo
         } catch (error) {
             console.error("❌ Redux: Update todo failed:", error.message)
@@ -79,9 +162,7 @@ export const deleteTodoAsync = createAsyncThunk("todos/deleteTodo", async (id, {
         await todoApi.deleteTodo(id)
         console.log("✅ Redux: Delete todo successful:", id)
 
-        // Fetch updated todos list
         dispatch(fetchTodos())
-
         return id
     } catch (error) {
         console.error("❌ Redux: Delete todo failed:", error.message)
@@ -95,9 +176,7 @@ export const editTodoAsync = createAsyncThunk("todos/editTodo", async (id, { dis
         const updatedTodo = await todoApi.setEditMode(id, true)
         console.log("✅ Redux: Edit mode set:", updatedTodo)
 
-        // Fetch updated todos list
         dispatch(fetchTodos())
-
         return updatedTodo
     } catch (error) {
         console.error("❌ Redux: Set edit mode failed:", error.message)
@@ -107,9 +186,14 @@ export const editTodoAsync = createAsyncThunk("todos/editTodo", async (id, { dis
 
 const initialState = {
     todos: [],
+    processedTodos: [], // Sorted and grouped todos
     loading: false,
     error: null,
     initialized: false,
+    // Sorting and grouping state
+    sortBy: "priority", // dateCreated, dateModified, name, priority
+    sortOrder: "asc", // asc, desc
+    groupBy: "none", // none, dateCreated, dateModified, name, priority
 }
 
 const todoSlice = createSlice({
@@ -118,6 +202,22 @@ const todoSlice = createSlice({
     reducers: {
         clearError: (state) => {
             state.error = null
+        },
+        setSortBy: (state, action) => {
+            state.sortBy = action.payload
+            state.processedTodos = sortTodos(state.todos, state.sortBy, state.sortOrder, state.groupBy)
+        },
+        setSortOrder: (state, action) => {
+            state.sortOrder = action.payload
+            state.processedTodos = sortTodos(state.todos, state.sortBy, state.sortOrder, state.groupBy)
+        },
+        setGroupBy: (state, action) => {
+            state.groupBy = action.payload
+            state.processedTodos = sortTodos(state.todos, state.sortBy, state.sortOrder, state.groupBy)
+        },
+        toggleSortOrder: (state) => {
+            state.sortOrder = state.sortOrder === "asc" ? "desc" : "asc"
+            state.processedTodos = sortTodos(state.todos, state.sortBy, state.sortOrder, state.groupBy)
         },
     },
     extraReducers: (builder) => {
@@ -131,7 +231,8 @@ const todoSlice = createSlice({
             .addCase(fetchTodos.fulfilled, (state, action) => {
                 console.log("✅ Redux: Fetch todos fulfilled:", action.payload)
                 state.loading = false
-                state.todos = action.payload
+                state.todos = action.payload.todos
+                state.processedTodos = action.payload.processedTodos
                 state.initialized = true
                 state.error = null
             })
@@ -144,74 +245,60 @@ const todoSlice = createSlice({
 
             // Add todo
             .addCase(addTodoAsync.pending, (state) => {
-                console.log("🔄 Redux: Add todo pending...")
                 state.loading = true
                 state.error = null
             })
             .addCase(addTodoAsync.fulfilled, (state) => {
-                console.log("✅ Redux: Add todo fulfilled - todos will be refreshed by fetchTodos")
                 state.loading = false
                 state.error = null
             })
             .addCase(addTodoAsync.rejected, (state, action) => {
-                console.error("❌ Redux: Add todo rejected:", action.payload)
                 state.loading = false
                 state.error = action.payload
             })
 
-            // Toggle complete
+            // Other async actions
             .addCase(toggleCompleteAsync.pending, (state) => {
                 state.error = null
             })
             .addCase(toggleCompleteAsync.fulfilled, (state) => {
-                console.log("✅ Redux: Toggle complete fulfilled - todos refreshed")
                 state.error = null
             })
             .addCase(toggleCompleteAsync.rejected, (state, action) => {
-                console.error("❌ Redux: Toggle complete rejected:", action.payload)
                 state.error = action.payload
             })
 
-            // Update todo
             .addCase(updateTodoAsync.pending, (state) => {
                 state.error = null
             })
             .addCase(updateTodoAsync.fulfilled, (state) => {
-                console.log("✅ Redux: Update todo fulfilled - todos refreshed")
                 state.error = null
             })
             .addCase(updateTodoAsync.rejected, (state, action) => {
-                console.error("❌ Redux: Update todo rejected:", action.payload)
                 state.error = action.payload
             })
 
-            // Delete todo
             .addCase(deleteTodoAsync.pending, (state) => {
                 state.error = null
             })
             .addCase(deleteTodoAsync.fulfilled, (state) => {
-                console.log("✅ Redux: Delete todo fulfilled - todos refreshed")
                 state.error = null
             })
             .addCase(deleteTodoAsync.rejected, (state, action) => {
-                console.error("❌ Redux: Delete todo rejected:", action.payload)
                 state.error = action.payload
             })
 
-            // Edit todo
             .addCase(editTodoAsync.pending, (state) => {
                 state.error = null
             })
             .addCase(editTodoAsync.fulfilled, (state) => {
-                console.log("✅ Redux: Edit todo fulfilled - todos refreshed")
                 state.error = null
             })
             .addCase(editTodoAsync.rejected, (state, action) => {
-                console.error("❌ Redux: Edit todo rejected:", action.payload)
                 state.error = action.payload
             })
     },
 })
 
-export const { clearError } = todoSlice.actions
+export const { clearError, setSortBy, setSortOrder, setGroupBy, toggleSortOrder } = todoSlice.actions
 export default todoSlice.reducer
