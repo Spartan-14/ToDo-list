@@ -1,36 +1,68 @@
-"use client"
-import { useDispatch } from "react-redux"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faPenToSquare, faTrash, faCheck, faUndo } from "@fortawesome/free-solid-svg-icons"
-import { toggleComplete, deleteTodo, editTodo } from "./store/todoSlice"
+import React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faPenToSquare, faTrash } from '@fortawesome/free-solid-svg-icons'
+import { faCircleCheck } from '@fortawesome/free-regular-svg-icons'
+import { toggleCompleteAsync, editTodoAsync, deleteTodoAsync } from './store/todoSlice'
 
 const Todo = ({ task }) => {
     const dispatch = useDispatch()
+    const { loading } = useSelector(state => state.todos)
 
-    const handleComplete = () => {
-        dispatch(toggleComplete(task.id))
+    const handleToggleComplete = async () => {
+        try {
+            await dispatch(toggleCompleteAsync({
+                id: task.id,
+                completed: task.completed
+            })).unwrap()
+        } catch (error) {
+            console.error('Failed to toggle todo:', error)
+        }
     }
 
-    const handleEdit = () => {
-        dispatch(editTodo(task.id))
+    const handleEdit = async () => {
+        try {
+            await dispatch(editTodoAsync(task.id)).unwrap()
+        } catch (error) {
+            console.error('Failed to edit todo:', error)
+        }
     }
 
-    const handleDelete = () => {
-        dispatch(deleteTodo(task.id))
+    const handleDelete = async () => {
+        try {
+            await dispatch(deleteTodoAsync(task.id)).unwrap()
+        } catch (error) {
+            console.error('Failed to delete todo:', error)
+        }
     }
 
     return (
         <div className="Todo">
-            <p className={`${task.completed ? "completed" : "incompleted"}`}>{task.task}</p>
+            <p
+                className={`${task.completed ? 'completed' : ''}`}
+                onClick={handleToggleComplete}
+            >
+                {task.task}
+            </p>
             <div>
                 <FontAwesomeIcon
-                    className={`complete-icon ${task.completed ? "completed-btn" : "incomplete-btn"}`}
-                    icon={task.completed ? faUndo : faCheck}
-                    onClick={handleComplete}
-                    title={task.completed ? "Mark as incomplete" : "Mark as complete"}
+                    icon={faCircleCheck}
+                    onClick={handleToggleComplete}
+                    className={`check-icon ${task.completed ? 'completed' : ''}`}
+                    style={{ opacity: loading ? 0.5 : 1 }}
                 />
-                <FontAwesomeIcon className="edit-icon" icon={faPenToSquare} onClick={handleEdit} />
-                <FontAwesomeIcon className="delete-icon" icon={faTrash} onClick={handleDelete} />
+                <FontAwesomeIcon
+                    icon={faPenToSquare}
+                    onClick={handleEdit}
+                    className="edit-icon"
+                    style={{ opacity: loading ? 0.5 : 1 }}
+                />
+                <FontAwesomeIcon
+                    icon={faTrash}
+                    onClick={handleDelete}
+                    className="delete-icon"
+                    style={{ opacity: loading ? 0.5 : 1 }}
+                />
             </div>
         </div>
     )

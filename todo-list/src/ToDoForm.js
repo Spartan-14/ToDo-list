@@ -1,19 +1,31 @@
 "use client"
 
 import { useState } from "react"
-import { useDispatch } from "react-redux"
-import { addTodo } from "./store/todoSlice"
+import { useDispatch, useSelector } from "react-redux"
+import { addTodoAsync } from "./store/todoSlice"
 
-export const ToDoForm = () => {
+const ToDoForm = () => {
     const [value, setValue] = useState("")
     const dispatch = useDispatch()
+    const { loading } = useSelector((state) => state.todos)
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault()
+        console.log(" Form: Submit triggered with value:", value)
 
         if (value.trim()) {
-            dispatch(addTodo(value))
-            setValue("")
+            console.log(" Form: Dispatching addTodoAsync...")
+
+            try {
+                await dispatch(addTodoAsync(value.trim())).unwrap()
+                console.log(" Form: Todo added successfully, clearing form...")
+                setValue("")
+            } catch (error) {
+                console.error(" Form: Add todo failed:", error)
+                // Error is handled by Redux state and displayed in ToDoWrapper
+            }
+        } else {
+            console.log(" Form: Empty value, not submitting")
         }
     }
 
@@ -25,11 +37,13 @@ export const ToDoForm = () => {
                 value={value}
                 placeholder="What is the task today?"
                 onChange={(e) => setValue(e.target.value)}
+                disabled={loading}
             />
-            <button type="submit" className="todo-btn">
-                Add task
+            <button type="submit" className="todo-btn" disabled={loading || !value.trim()}>
+                {loading ? " Adding..." : "Add task"}
             </button>
         </form>
     )
 }
-export default ToDoForm;
+
+export default ToDoForm
