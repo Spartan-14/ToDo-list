@@ -1,4 +1,5 @@
 "use client"
+import { useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import {
@@ -10,11 +11,14 @@ import {
     faExclamation,
     faCircle,
 } from "@fortawesome/free-solid-svg-icons"
-import { toggleCompleteAsync, deleteTodoAsync, editTodoAsync } from "./store/todoSlice"
+import { toggleCompleteAsync, softDeleteTodoAsync, editTodoAsync } from "./store/todoSlice"
+import DeleteConfirmModal from "./components/DeleteConfirmModal"
 
 const Todo = ({ task }) => {
     const dispatch = useDispatch()
     const { loading } = useSelector((state) => state.todos)
+    const [showDeleteModal, setShowDeleteModal] = useState(false)
+    const [isDeleting, setIsDeleting] = useState(false)
 
     const handleComplete = async () => {
         console.log("🔄 Toggling complete for todo:", task.id)
@@ -41,16 +45,26 @@ const Todo = ({ task }) => {
         }
     }
 
-    const handleDelete = async () => {
-        if (window.confirm("Are you sure you want to delete this task?")) {
-            console.log("🔄 Deleting todo:", task.id)
-            try {
-                await dispatch(deleteTodoAsync(task.id)).unwrap()
-                console.log("✅ Todo deleted successfully")
-            } catch (error) {
-                console.error("❌ Failed to delete todo:", error)
-            }
+    const handleDeleteClick = () => {
+        setShowDeleteModal(true)
+    }
+
+    const handleDeleteConfirm = async () => {
+        setIsDeleting(true)
+        console.log("🔄 Soft deleting todo:", task.id)
+        try {
+            await dispatch(softDeleteTodoAsync(task.id)).unwrap()
+            console.log("✅ Todo soft deleted successfully")
+            setShowDeleteModal(false)
+        } catch (error) {
+            console.error("❌ Failed to soft delete todo:", error)
+        } finally {
+            setIsDeleting(false)
         }
+    }
+
+    const handleDeleteCancel = () => {
+        setShowDeleteModal(false)
     }
 
     const getPriorityInfo = (priority) => {
@@ -84,52 +98,62 @@ const Todo = ({ task }) => {
     const priorityInfo = getPriorityInfo(task.priority)
 
     return (
-        <div className={`Todo ${task.completed ? "completed-task" : ""} ${priorityInfo?.className || ""}`}>
-            <div className="todo-content">
-                <div className="todo-header">
+        <>
+            <div className={`Todo ${task.completed ? "completed-task" : ""} ${priorityInfo?.className || ""}`}>
+                <div className="todo-content">
+                    <div className="todo-header">
+                        {priorityInfo && (
+                            <div className="priority-indicator" title={priorityInfo.label}>
+                                <FontAwesomeIcon
+                                    icon={priorityInfo.icon}
+                                    style={{ color: priorityInfo.color }}
+                                    className="priority-icon"
+                                />
+                            </div>
+                        )}
+                        <p className={`task-text ${task.completed ? "completed" : "incompleted"}`}>{task.task}</p>
+                    </div>
+
                     {priorityInfo && (
-                        <div className="priority-indicator" title={priorityInfo.label}>
-                            <FontAwesomeIcon
-                                icon={priorityInfo.icon}
-                                style={{ color: priorityInfo.color }}
-                                className="priority-icon"
-                            />
+                        <div className="priority-label">
+                            <small>{priorityInfo.label}</small>
                         </div>
                     )}
-                    <p className={`task-text ${task.completed ? "completed" : "incompleted"}`}>{task.task}</p>
                 </div>
 
-                {priorityInfo && (
-                    <div className="priority-label">
-                        <small>{priorityInfo.label}</small>
-                    </div>
-                )}
+                <div className="todo-actions">
+                    <FontAwesomeIcon
+                        className={`complete-icon ${task.completed ? "completed-btn" : "incomplete-btn"}`}
+                        icon={task.completed ? faUndo : faCheck}
+                        onClick={handleComplete}
+                        title={task.completed ? "Mark as incomplete" : "Mark as complete"}
+                        style={{ opacity: loading ? 0.5 : 1 }}
+                    />
+                    <FontAwesomeIcon
+                        className="edit-icon"
+                        icon={faPenToSquare}
+                        onClick={handleEdit}
+                        title="Edit task"
+                        style={{ opacity: loading ? 0.5 : 1 }}
+                    />
+                    <FontAwesomeIcon
+                        className="delete-icon"
+                        icon={faTrash}
+                        onClick={handleDeleteClick}
+                        title="Delete task"
+                        style={{ opacity: loading ? 0.5 : 1 }}
+                    />
+                </div>
             </div>
 
-            <div className="todo-actions">
-                <FontAwesomeIcon
-                    className={`complete-icon ${task.completed ? "completed-btn" : "incomplete-btn"}`}
-                    icon={task.completed ? faUndo : faCheck}
-                    onClick={handleComplete}
-                    title={task.completed ? "Mark as incomplete" : "Mark as complete"}
-                    style={{ opacity: loading ? 0.5 : 1 }}
-                />
-                <FontAwesomeIcon
-                    className="edit-icon"
-                    icon={faPenToSquare}
-                    onClick={handleEdit}
-                    title="Edit task"
-                    style={{ opacity: loading ? 0.5 : 1 }}
-                />
-                <FontAwesomeIcon
-                    className="delete-icon"
-                    icon={faTrash}
-                    onClick={handleDelete}
-                    title="Delete task"
-                    style={{ opacity: loading ? 0.5 : 1 }}
-                />
-            </div>
-        </div>
+            <DeleteConfirmModal
+                isOpen={showDeleteModal}
+                onClose={handleDeleteCancel}
+                onConfirm={handleDeleteConfirm}
+                taskName={task.task}
+                loading={isDeleting}
+            />
+        </>
     )
 }
 

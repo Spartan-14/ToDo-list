@@ -1,109 +1,172 @@
 "use client"
 
+import { useState, useRef, useEffect } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import {
     faSort,
-    faSortUp,
-    faSortDown,
+    faArrowUpAZ,
+    faArrowDownZA,
+    faLayerGroup,
+    faChevronDown,
     faCalendarAlt,
     faEdit,
     faFont,
     faExclamationTriangle,
-    faLayerGroup,
+    faBars,
 } from "@fortawesome/free-solid-svg-icons"
-import { setSortBy, setSortOrder, setGroupBy, toggleSortOrder } from "../store/todoSlice"
+import { setSortBy, setGroupBy, toggleSortOrder } from "../store/todoSlice"
 
 const SortingControls = () => {
     const dispatch = useDispatch()
     const { sortBy, sortOrder, groupBy } = useSelector((state) => state.todos)
 
+    const [showSortDropdown, setShowSortDropdown] = useState(false)
+    const [showGroupDropdown, setShowGroupDropdown] = useState(false)
+
+    const sortDropdownRef = useRef(null)
+    const groupDropdownRef = useRef(null)
+
     const sortOptions = [
+        { value: "priority", label: "Priority", icon: faExclamationTriangle },
         { value: "dateCreated", label: "Date Created", icon: faCalendarAlt },
         { value: "dateModified", label: "Date Modified", icon: faEdit },
         { value: "name", label: "Name", icon: faFont },
-        { value: "priority", label: "Priority", icon: faExclamationTriangle },
     ]
 
     const groupOptions = [
-        { value: "none", label: "No Grouping" },
-        { value: "dateCreated", label: "Date Created" },
-        { value: "dateModified", label: "Date Modified" },
-        { value: "name", label: "Name" },
-        { value: "priority", label: "Priority" },
+        { value: "none", label: "No Grouping", icon: faBars },
+        { value: "priority", label: "Priority", icon: faExclamationTriangle },
+        { value: "dateCreated", label: "Date Created", icon: faCalendarAlt },
+        { value: "dateModified", label: "Date Modified", icon: faEdit },
+        { value: "name", label: "Name", icon: faFont },
     ]
 
-    const handleSortChange = (newSortBy) => {
-        if (newSortBy === sortBy) {
-            // If clicking the same sort option, toggle order
-            dispatch(toggleSortOrder())
-        } else {
-            // If clicking a different sort option, set it and default to ascending
-            dispatch(setSortBy(newSortBy))
-            dispatch(setSortOrder("asc"))
+    // Close dropdowns when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (sortDropdownRef.current && !sortDropdownRef.current.contains(event.target)) {
+                setShowSortDropdown(false)
+            }
+            if (groupDropdownRef.current && !groupDropdownRef.current.contains(event.target)) {
+                setShowGroupDropdown(false)
+            }
         }
+
+        document.addEventListener("mousedown", handleClickOutside)
+        return () => document.removeEventListener("mousedown", handleClickOutside)
+    }, [])
+
+    const handleSortSelect = (newSortBy) => {
+        dispatch(setSortBy(newSortBy))
+        setShowSortDropdown(false)
     }
 
-    const getSortIcon = (option) => {
-        if (sortBy === option) {
-            return sortOrder === "asc" ? faSortUp : faSortDown
-        }
-        return faSort
+    const handleOrderToggle = () => {
+        dispatch(toggleSortOrder())
     }
 
-    const getSortButtonClass = (option) => {
-        return `sort-button ${sortBy === option ? "active" : ""}`
+    const handleGroupSelect = (newGroupBy) => {
+        dispatch(setGroupBy(newGroupBy))
+        setShowGroupDropdown(false)
+    }
+
+    const getCurrentSortOption = () => {
+        return sortOptions.find((option) => option.value === sortBy) || sortOptions[0]
+    }
+
+    const getCurrentGroupOption = () => {
+        return groupOptions.find((option) => option.value === groupBy) || groupOptions[0]
     }
 
     return (
-        <div className="sorting-controls">
-            <div className="sorting-section">
-                <div className="section-header">
-                    <FontAwesomeIcon icon={faSort} className="section-icon" />
-                    <span className="section-title">Sort by</span>
-                </div>
+        <div className="sorting-toolbar">
+            <div className="toolbar-section">
+                <span className="toolbar-label">Sort & Filter</span>
 
-                <div className="sort-buttons">
-                    {sortOptions.map((option) => (
+                <div className="toolbar-controls">
+                    {/* Sort Dropdown */}
+                    <div className="control-group" ref={sortDropdownRef}>
                         <button
-                            key={option.value}
-                            className={getSortButtonClass(option.value)}
-                            onClick={() => handleSortChange(option.value)}
-                            title={`Sort by ${option.label} (${sortBy === option.value ? (sortOrder === "asc" ? "Ascending" : "Descending") : "Click to sort"})`}
+                            className="toolbar-button sort-button"
+                            onClick={() => setShowSortDropdown(!showSortDropdown)}
+                            title="Sort by"
                         >
-                            <FontAwesomeIcon icon={option.icon} className="sort-option-icon" />
-                            <span className="sort-label">{option.label}</span>
-                            <FontAwesomeIcon icon={getSortIcon(option.value)} className="sort-direction-icon" />
+                            <FontAwesomeIcon icon={faSort} className="button-icon" />
+                            <span className="button-text">{getCurrentSortOption().label}</span>
+                            <FontAwesomeIcon icon={faChevronDown} className="dropdown-arrow" />
                         </button>
-                    ))}
-                </div>
-            </div>
 
-            <div className="grouping-section">
-                <div className="section-header">
-                    <FontAwesomeIcon icon={faLayerGroup} className="section-icon" />
-                    <span className="section-title">Group by</span>
-                </div>
-
-                <select className="group-select" value={groupBy} onChange={(e) => dispatch(setGroupBy(e.target.value))}>
-                    {groupOptions.map((option) => (
-                        <option key={option.value} value={option.value}>
-                            {option.label}
-                        </option>
-                    ))}
-                </select>
-            </div>
-
-            <div className="current-settings">
-                <div className="setting-item">
-                    <strong>Sort:</strong> {sortOptions.find((opt) => opt.value === sortBy)?.label}
-                    <span className="sort-order">({sortOrder === "asc" ? "↑" : "↓"})</span>
-                </div>
-                {groupBy !== "none" && (
-                    <div className="setting-item">
-                        <strong>Group:</strong> {groupOptions.find((opt) => opt.value === groupBy)?.label}
+                        {showSortDropdown && (
+                            <div className="dropdown-menu sort-dropdown">
+                                {sortOptions.map((option) => (
+                                    <button
+                                        key={option.value}
+                                        className={`dropdown-item ${sortBy === option.value ? "active" : ""}`}
+                                        onClick={() => handleSortSelect(option.value)}
+                                    >
+                                        <FontAwesomeIcon icon={option.icon} className="item-icon" />
+                                        <span className="item-text">{option.label}</span>
+                                        {sortBy === option.value && <div className="active-indicator"></div>}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
                     </div>
-                )}
+
+                    {/* Order Toggle */}
+                    <button
+                        className="toolbar-button order-button"
+                        onClick={handleOrderToggle}
+                        title={`Sort ${sortOrder === "asc" ? "Ascending" : "Descending"} - Click to toggle`}
+                    >
+                        <FontAwesomeIcon icon={sortOrder === "asc" ? faArrowUpAZ : faArrowDownZA} className="button-icon" />
+                        <span className="button-text">{sortOrder === "asc" ? "A-Z" : "Z-A"}</span>
+                    </button>
+
+                    {/* Group Dropdown */}
+                    <div className="control-group" ref={groupDropdownRef}>
+                        <button
+                            className="toolbar-button group-button"
+                            onClick={() => setShowGroupDropdown(!showGroupDropdown)}
+                            title="Group by"
+                        >
+                            <FontAwesomeIcon icon={faLayerGroup} className="button-icon" />
+                            <span className="button-text">{getCurrentGroupOption().label}</span>
+                            <FontAwesomeIcon icon={faChevronDown} className="dropdown-arrow" />
+                        </button>
+
+                        {showGroupDropdown && (
+                            <div className="dropdown-menu group-dropdown">
+                                {groupOptions.map((option) => (
+                                    <button
+                                        key={option.value}
+                                        className={`dropdown-item ${groupBy === option.value ? "active" : ""}`}
+                                        onClick={() => handleGroupSelect(option.value)}
+                                    >
+                                        <FontAwesomeIcon icon={option.icon} className="item-icon" />
+                                        <span className="item-text">{option.label}</span>
+                                        {groupBy === option.value && <div className="active-indicator"></div>}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+
+            {/* Status Indicator */}
+            <div className="sort-status">
+        <span className="status-text">
+          Sorted by <strong>{getCurrentSortOption().label}</strong>
+            {sortOrder === "asc" ? " ↑" : " ↓"}
+            {groupBy !== "none" && (
+                <span>
+              {" "}
+                    • Grouped by <strong>{getCurrentGroupOption().label}</strong>
+            </span>
+            )}
+        </span>
             </div>
         </div>
     )

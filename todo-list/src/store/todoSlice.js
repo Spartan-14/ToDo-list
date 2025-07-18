@@ -3,7 +3,9 @@ import * as todoApi from "../supabase/todoApi"
 
 // Sorting and grouping utilities
 const sortTodos = (todos, sortBy, sortOrder, groupBy) => {
-    const sortedTodos = [...todos]
+    // Filter out soft-deleted todos
+    const activeTodos = todos.filter((todo) => !todo.is_deleted)
+    const sortedTodos = [...activeTodos]
 
     // Primary sorting function
     const getSortValue = (todo, criteria) => {
@@ -156,16 +158,35 @@ export const updateTodoAsync = createAsyncThunk(
     },
 )
 
-export const deleteTodoAsync = createAsyncThunk("todos/deleteTodo", async (id, { dispatch, rejectWithValue }) => {
+// NEW: Soft delete instead of hard delete
+export const softDeleteTodoAsync = createAsyncThunk(
+    "todos/softDeleteTodo",
+    async (id, { dispatch, rejectWithValue }) => {
+        try {
+            console.log("🔄 Redux: Soft deleting todo:", id)
+            await todoApi.softDeleteTodo(id)
+            console.log("✅ Redux: Soft delete todo successful:", id)
+
+            dispatch(fetchTodos())
+            return id
+        } catch (error) {
+            console.error("❌ Redux: Soft delete todo failed:", error.message)
+            return rejectWithValue(error.message)
+        }
+    },
+)
+
+// NEW: Restore soft-deleted todo
+export const restoreTodoAsync = createAsyncThunk("todos/restoreTodo", async (id, { dispatch, rejectWithValue }) => {
     try {
-        console.log("🔄 Redux: Deleting todo:", id)
-        await todoApi.deleteTodo(id)
-        console.log("✅ Redux: Delete todo successful:", id)
+        console.log("🔄 Redux: Restoring todo:", id)
+        await todoApi.restoreTodo(id)
+        console.log("✅ Redux: Restore todo successful:", id)
 
         dispatch(fetchTodos())
         return id
     } catch (error) {
-        console.error("❌ Redux: Delete todo failed:", error.message)
+        console.error("❌ Redux: Restore todo failed:", error.message)
         return rejectWithValue(error.message)
     }
 })
@@ -186,7 +207,8 @@ export const editTodoAsync = createAsyncThunk("todos/editTodo", async (id, { dis
 
 const initialState = {
     todos: [],
-    processedTodos: [], // Sorted and grouped todos
+    processedTodos: [], // Sorted and grouped todos (active only)
+    deletedTodos: [], // Soft-deleted todos for trash view
     loading: false,
     error: null,
     initialized: false,
@@ -233,6 +255,7 @@ const todoSlice = createSlice({
                 state.loading = false
                 state.todos = action.payload.todos
                 state.processedTodos = action.payload.processedTodos
+                state.deletedTodos = action.payload.todos.filter((todo) => todo.is_deleted)
                 state.initialized = true
                 state.error = null
             })
@@ -278,13 +301,25 @@ const todoSlice = createSlice({
                 state.error = action.payload
             })
 
-            .addCase(deleteTodoAsync.pending, (state) => {
+            // Soft delete
+            .addCase(softDeleteTodoAsync.pending, (state) => {
                 state.error = null
             })
-            .addCase(deleteTodoAsync.fulfilled, (state) => {
+            .addCase(softDeleteTodoAsync.fulfilled, (state) => {
                 state.error = null
             })
-            .addCase(deleteTodoAsync.rejected, (state, action) => {
+            .addCase(softDeleteTodoAsync.rejected, (state, action) => {
+                state.error = action.payload
+            })
+
+            // Restore
+            .addCase(restoreTodoAsync.pending, (state) => {
+                state.error = null
+            })
+            .addCase(restoreTodoAsync.fulfilled, (state) => {
+                state.error = null
+            })
+            .addCase(restoreTodoAsync.rejected, (state, action) => {
                 state.error = action.payload
             })
 
