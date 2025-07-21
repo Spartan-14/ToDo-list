@@ -205,6 +205,24 @@ export const editTodoAsync = createAsyncThunk("todos/editTodo", async (id, { dis
     }
 })
 
+// NEW: Cancel edit mode without saving changes
+export const cancelEditTodoAsync = createAsyncThunk(
+    "todos/cancelEditTodo",
+    async (id, { dispatch, rejectWithValue }) => {
+        try {
+            console.log("🔄 Redux: Cancelling edit mode:", id)
+            const updatedTodo = await todoApi.setEditMode(id, false)
+            console.log("✅ Redux: Edit mode cancelled:", updatedTodo)
+
+            dispatch(fetchTodos())
+            return updatedTodo
+        } catch (error) {
+            console.error("❌ Redux: Cancel edit mode failed:", error.message)
+            return rejectWithValue(error.message)
+        }
+    },
+)
+
 const initialState = {
     todos: [],
     processedTodos: [], // Sorted and grouped todos (active only)
@@ -330,6 +348,15 @@ const todoSlice = createSlice({
                 state.error = null
             })
             .addCase(editTodoAsync.rejected, (state, action) => {
+                state.error = action.payload
+            })
+            .addCase(cancelEditTodoAsync.pending, (state) => {
+                state.error = null
+            })
+            .addCase(cancelEditTodoAsync.fulfilled, (state) => {
+                state.error = null
+            })
+            .addCase(cancelEditTodoAsync.rejected, (state, action) => {
                 state.error = action.payload
             })
     },

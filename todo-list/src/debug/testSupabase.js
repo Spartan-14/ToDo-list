@@ -2,7 +2,7 @@ import { testConnection } from "../supabase/client"
 import * as todoApi from "../supabase/todoApi"
 
 // Debug function to test all Supabase operations
-export  const runSupabaseTests = async () => {
+export const runSupabaseTests = async () => {
     console.log("🧪 Starting Supabase tests...")
 
     try {
@@ -39,9 +39,9 @@ export  const runSupabaseTests = async () => {
             console.log("Delete result:", deleteResult)
         }
 
-        console.log(" All tests completed successfully!")
+        console.log("✅ All tests completed successfully!")
     } catch (error) {
-        console.error(" Test failed:", error)
+        console.error("❌ Test failed:", error)
     }
 }
 

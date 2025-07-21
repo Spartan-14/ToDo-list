@@ -2,17 +2,10 @@
 import { useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import {
-    faPenToSquare,
-    faTrash,
-    faCheck,
-    faUndo,
-    faExclamationTriangle,
-    faExclamation,
-    faCircle,
-} from "@fortawesome/free-solid-svg-icons"
+import { faPenToSquare, faTrash, faCheck, faUndo } from "@fortawesome/free-solid-svg-icons"
 import { toggleCompleteAsync, softDeleteTodoAsync, editTodoAsync } from "./store/todoSlice"
 import DeleteConfirmModal from "./components/DeleteConfirmModal"
+import PriorityOrb from "./components/PriorityOrb"
 
 const Todo = ({ task }) => {
     const dispatch = useDispatch()
@@ -67,56 +60,44 @@ const Todo = ({ task }) => {
         setShowDeleteModal(false)
     }
 
-    const getPriorityInfo = (priority) => {
+    const getPriorityClass = (priority) => {
         switch (priority) {
             case 1:
-                return {
-                    icon: faExclamationTriangle,
-                    label: "Urgent",
-                    className: "priority-urgent",
-                    color: "#dc3545",
-                }
+                return "priority-urgent"
             case 2:
-                return {
-                    icon: faExclamation,
-                    label: "Higher Priority",
-                    className: "priority-higher",
-                    color: "#ffc107",
-                }
+                return "priority-higher"
             case 3:
-                return {
-                    icon: faCircle,
-                    label: "Normal Priority",
-                    className: "priority-normal",
-                    color: "#28a745",
-                }
+                return "priority-normal"
             default:
-                return null
+                return ""
         }
     }
 
-    const priorityInfo = getPriorityInfo(task.priority)
+    const getPriorityLabel = (priority) => {
+        switch (priority) {
+            case 1:
+                return "URGENT MISSION"
+            case 2:
+                return "HIGH PRIORITY"
+            case 3:
+                return "STANDARD OPS"
+            default:
+                return "ROUTINE TASK"
+        }
+    }
 
     return (
         <>
-            <div className={`Todo ${task.completed ? "completed-task" : ""} ${priorityInfo?.className || ""}`}>
+            <div className={`Todo ${task.completed ? "completed-task" : ""} ${getPriorityClass(task.priority)}`}>
                 <div className="todo-content">
                     <div className="todo-header">
-                        {priorityInfo && (
-                            <div className="priority-indicator" title={priorityInfo.label}>
-                                <FontAwesomeIcon
-                                    icon={priorityInfo.icon}
-                                    style={{ color: priorityInfo.color }}
-                                    className="priority-icon"
-                                />
-                            </div>
-                        )}
+                        {task.priority && <PriorityOrb priority={task.priority} size="medium" animated={true} />}
                         <p className={`task-text ${task.completed ? "completed" : "incompleted"}`}>{task.task}</p>
                     </div>
 
-                    {priorityInfo && (
+                    {task.priority && (
                         <div className="priority-label">
-                            <small>{priorityInfo.label}</small>
+                            <small>{getPriorityLabel(task.priority)}</small>
                         </div>
                     )}
                 </div>
@@ -126,21 +107,21 @@ const Todo = ({ task }) => {
                         className={`complete-icon ${task.completed ? "completed-btn" : "incomplete-btn"}`}
                         icon={task.completed ? faUndo : faCheck}
                         onClick={handleComplete}
-                        title={task.completed ? "Mark as incomplete" : "Mark as complete"}
+                        title={task.completed ? "REACTIVATE MISSION" : "COMPLETE MISSION"}
                         style={{ opacity: loading ? 0.5 : 1 }}
                     />
                     <FontAwesomeIcon
                         className="edit-icon"
                         icon={faPenToSquare}
                         onClick={handleEdit}
-                        title="Edit task"
+                        title="MODIFY MISSION"
                         style={{ opacity: loading ? 0.5 : 1 }}
                     />
                     <FontAwesomeIcon
                         className="delete-icon"
                         icon={faTrash}
                         onClick={handleDeleteClick}
-                        title="Delete task"
+                        title="ABORT MISSION"
                         style={{ opacity: loading ? 0.5 : 1 }}
                     />
                 </div>

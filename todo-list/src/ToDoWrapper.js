@@ -7,15 +7,18 @@ import {
     faTasks,
     faCheckCircle,
     faExclamationTriangle,
-    faExclamation,
-    faCircle,
-    faPlus,
     faStar,
     faFire,
+    faRocket,
+    faBolt,
 } from "@fortawesome/free-solid-svg-icons"
 import ToDoForm from "./ToDoForm"
 import SortingControls from "./components/SortingControls"
 import TodoGroup from "./components/TodoGroup"
+import ParticleBackground from "./components/ParticleBackground"
+import AnimatedGradient from "./components/AnimatedGradient"
+import GlassmorphicCard from "./components/GlassmorphicCard"
+import PriorityOrb from "./components/PriorityOrb"
 import { fetchTodos, clearError } from "./store/todoSlice"
 
 const ToDoWrapper = () => {
@@ -43,19 +46,23 @@ const ToDoWrapper = () => {
     // Show loading state on initial load
     if (loading && !initialized) {
         return (
-            <div className="app-container">
-                <div className="app-header">
-                    <div className="header-content">
-                        <h1 className="app-title">
-                            <FontAwesomeIcon icon={faTasks} className="app-icon" />
-                            TaskMaster Pro
-                        </h1>
+            <div className="App">
+                <AnimatedGradient />
+                <ParticleBackground enabled={true} />
+                <div className="app-container">
+                    <div className="app-header">
+                        <div className="header-content">
+                            <h1 className="app-title">
+                                <FontAwesomeIcon icon={faRocket} className="app-icon" />
+                                TASKMASTER
+                            </h1>
+                        </div>
                     </div>
-                </div>
-                <div className="loading-container">
-                    <div className="loading-spinner"></div>
-                    <h3>Loading your workspace...</h3>
-                    <p>Preparing your tasks and priorities</p>
+                    <div className="loading-container">
+                        <div className="loading-spinner"></div>
+                        <h3>INITIALIZING COMMAND CENTER...</h3>
+                        <p>Preparing your mission-critical tasks</p>
+                    </div>
                 </div>
             </div>
         )
@@ -74,125 +81,130 @@ const ToDoWrapper = () => {
     const completionPercentage = totalTodos > 0 ? Math.round((completedTodos / totalTodos) * 100) : 0
 
     return (
-        <div className="app-container">
-            {/* Header */}
-            <div className="app-header">
-                <div className="header-content">
-                    <h1 className="app-title">
-                        <FontAwesomeIcon icon={faTasks} className="app-icon" />
-                        TaskMaster Pro
-                    </h1>
-                    <div className="header-stats">
-                        <div className="stat-badge">
-                            <FontAwesomeIcon icon={faTasks} />
-                            <span>{totalTodos} Tasks</span>
-                        </div>
-                        <div className="stat-badge completed">
-                            <FontAwesomeIcon icon={faCheckCircle} />
-                            <span>{completionPercentage}% Done</span>
-                        </div>
-                        {urgentTodos > 0 && (
-                            <div
-                                className="stat-badge"
-                                style={{
-                                    background: "rgba(217, 83, 79, 0.2)",
-                                    borderColor: "rgba(217, 83, 79, 0.3)",
-                                    color: "#D9534F",
-                                }}
-                            >
-                                <FontAwesomeIcon icon={faFire} />
-                                <span>{urgentTodos} Urgent</span>
+        <div className="App">
+            <AnimatedGradient />
+            <ParticleBackground enabled={true} />
+
+            <div className="app-container">
+                {/* Header */}
+                <div className="app-header">
+                    <div className="header-content">
+                        <h1 className="app-title">
+                            <FontAwesomeIcon icon={faRocket} className="app-icon" />
+                            TASKMASTER
+                        </h1>
+                        <div className="header-stats">
+                            <div className="stat-badge">
+                                <FontAwesomeIcon icon={faTasks} />
+                                <span>{totalTodos} MISSIONS</span>
                             </div>
-                        )}
-                    </div>
-                </div>
-            </div>
-
-            {/* Error Display */}
-            {error && (
-                <div className="error-banner">
-                    <div className="error-content">
-                        <FontAwesomeIcon icon={faExclamationTriangle} className="error-icon" />
-                        <span className="error-text">{error}</span>
-                        <button onClick={handleClearError} className="error-dismiss">
-                            ✕
-                        </button>
-                    </div>
-                </div>
-            )}
-
-            {/* Main Content */}
-            <div className="app-content">
-                {/* Priority Overview */}
-                {(urgentTodos > 0 || higherPriorityTodos > 0 || normalPriorityTodos > 0) && (
-                    <div className="priority-overview">
-                        <h3 className="overview-title">
-                            <FontAwesomeIcon icon={faStar} />
-                            Priority Dashboard
-                        </h3>
-                        <div className="priority-cards">
+                            <div className="stat-badge completed">
+                                <FontAwesomeIcon icon={faCheckCircle} />
+                                <span>{completionPercentage}% COMPLETE</span>
+                            </div>
                             {urgentTodos > 0 && (
-                                <div className="priority-card urgent">
-                                    <FontAwesomeIcon icon={faExclamationTriangle} className="card-icon" />
-                                    <div className="card-content">
-                                        <span className="card-number">{urgentTodos}</span>
-                                        <span className="card-label">Urgent Tasks</span>
-                                    </div>
-                                </div>
-                            )}
-                            {higherPriorityTodos > 0 && (
-                                <div className="priority-card higher">
-                                    <FontAwesomeIcon icon={faExclamation} className="card-icon" />
-                                    <div className="card-content">
-                                        <span className="card-number">{higherPriorityTodos}</span>
-                                        <span className="card-label">Higher Priority</span>
-                                    </div>
-                                </div>
-                            )}
-                            {normalPriorityTodos > 0 && (
-                                <div className="priority-card normal">
-                                    <FontAwesomeIcon icon={faCircle} className="card-icon" />
-                                    <div className="card-content">
-                                        <span className="card-number">{normalPriorityTodos}</span>
-                                        <span className="card-label">Normal Priority</span>
-                                    </div>
+                                <div
+                                    className="stat-badge"
+                                    style={{
+                                        background: "rgba(232, 119, 34, 0.2)",
+                                        borderColor: "rgba(232, 119, 34, 0.4)",
+                                        color: "#E87722",
+                                    }}
+                                >
+                                    <FontAwesomeIcon icon={faFire} />
+                                    <span>{urgentTodos} URGENT</span>
                                 </div>
                             )}
                         </div>
                     </div>
-                )}
-
-                {/* Add Task Section */}
-                <div className="add-task-section">
-                    <div className="section-header">
-                        <FontAwesomeIcon icon={faPlus} className="section-icon" />
-                        <h3 className="section-title">Create New Task</h3>
-                    </div>
-                    <ToDoForm />
                 </div>
 
-                {/* Sorting Controls */}
-                <SortingControls />
-
-                {/* Loading indicator for operations */}
-                {loading && initialized && (
-                    <div className="operation-loading">
-                        <div className="loading-spinner small"></div>
-                        <span>Processing your request...</span>
+                {/* Error Display */}
+                {error && (
+                    <div className="error-banner">
+                        <div className="error-content">
+                            <FontAwesomeIcon icon={faExclamationTriangle} className="error-icon" />
+                            <span className="error-text">SYSTEM ALERT: {error}</span>
+                            <button onClick={handleClearError} className="error-dismiss">
+                                ✕
+                            </button>
+                        </div>
                     </div>
                 )}
 
-                {/* Tasks Section */}
-                <div className="tasks-section">
-                    {todos.length === 0 && initialized && !loading ? (
-                        <div className="empty-state">
-                            <FontAwesomeIcon icon={faTasks} className="empty-icon" />
-                            <h3>Ready to get productive?</h3>
-                            <p>Create your first task above and start organizing your workflow with TaskMaster Pro</p>
-                        </div>
-                    ) : (
-                        <div className="tasks-container">{renderTodos()}</div>
+                {/* Main Content */}
+                <div className="app-content">
+                    {/* Priority Overview */}
+                    {(urgentTodos > 0 || higherPriorityTodos > 0 || normalPriorityTodos > 0) && (
+                        <GlassmorphicCard variant="priority" elevation="high" className="priority-overview">
+                            <h3 className="overview-title">
+                                <FontAwesomeIcon icon={faStar} />
+                                PRIORITY DASHBOARD
+                            </h3>
+                            <div className="priority-cards">
+                                {urgentTodos > 0 && (
+                                    <div className="priority-card urgent">
+                                        <PriorityOrb priority={1} size="xl" animated={true} />
+                                        <div className="card-content">
+                                            <span className="card-number">{urgentTodos}</span>
+                                            <span className="card-label">URGENT MISSIONS</span>
+                                        </div>
+                                    </div>
+                                )}
+                                {higherPriorityTodos > 0 && (
+                                    <div className="priority-card higher">
+                                        <PriorityOrb priority={2} size="xl" animated={true} />
+                                        <div className="card-content">
+                                            <span className="card-number">{higherPriorityTodos}</span>
+                                            <span className="card-label">HIGH PRIORITY</span>
+                                        </div>
+                                    </div>
+                                )}
+                                {normalPriorityTodos > 0 && (
+                                    <div className="priority-card normal">
+                                        <PriorityOrb priority={3} size="xl" animated={true} />
+                                        <div className="card-content">
+                                            <span className="card-number">{normalPriorityTodos}</span>
+                                            <span className="card-label">STANDARD OPS</span>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </GlassmorphicCard>
                     )}
+
+                    {/* Add Task Section */}
+                    <GlassmorphicCard variant="action" elevation="medium" className="add-task-section">
+                        <div className="section-header">
+                            <FontAwesomeIcon icon={faBolt} className="section-icon" />
+                            <h3 className="section-title">DEPLOY NEW MISSION</h3>
+                        </div>
+                        <ToDoForm />
+                    </GlassmorphicCard>
+
+                    {/* Sorting Controls */}
+                    <SortingControls />
+
+                    {/* Loading indicator for operations */}
+                    {loading && initialized && (
+                        <div className="operation-loading">
+                            <div className="loading-spinner small"></div>
+                            <span>PROCESSING COMMAND...</span>
+                        </div>
+                    )}
+
+                    {/* Tasks Section */}
+                    <GlassmorphicCard variant="default" elevation="medium" className="tasks-section">
+                        {todos.length === 0 && initialized && !loading ? (
+                            <div className="empty-state">
+                                <FontAwesomeIcon icon={faRocket} className="empty-icon" />
+                                <h3>READY FOR DEPLOYMENT?</h3>
+                                <p>Initialize your first mission above and begin your legendary journey with TaskMaster</p>
+                            </div>
+                        ) : (
+                            <div className="tasks-container">{renderTodos()}</div>
+                        )}
+                    </GlassmorphicCard>
                 </div>
             </div>
         </div>

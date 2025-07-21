@@ -2,6 +2,8 @@
 
 import { useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
+import { faRocket } from "@fortawesome/free-solid-svg-icons"
+import SuperheroButton from "./components/SuperheroButton"
 import { addTodoAsync } from "./store/todoSlice"
 
 const ToDoForm = () => {
@@ -10,11 +12,13 @@ const ToDoForm = () => {
     const dispatch = useDispatch()
     const { loading } = useSelector((state) => state.todos)
 
+    const CHARACTER_LIMIT = 50
+
     const handleSubmit = async (e) => {
         e.preventDefault()
         console.log("🔄 Form: Submit triggered with value:", value, "priority:", priority)
 
-        if (value.trim()) {
+        if (value.trim() && value.trim().length <= CHARACTER_LIMIT) {
             console.log("🔄 Form: Dispatching addTodoAsync...")
 
             const todoData = {
@@ -32,34 +36,53 @@ const ToDoForm = () => {
                 // Error is handled by Redux state and displayed in ToDoWrapper
             }
         } else {
-            console.log("⚠️ Form: Empty value, not submitting")
+            console.log("⚠️ Form: Invalid input - empty or too long")
+        }
+    }
+
+    const handleInputChange = (e) => {
+        const newValue = e.target.value
+        if (newValue.length <= CHARACTER_LIMIT) {
+            setValue(newValue)
         }
     }
 
     const getPriorityLabel = (priorityValue) => {
         switch (priorityValue) {
             case "1":
-                return "🔴 Urgent"
+                return "🔴 URGENT"
             case "2":
-                return "🟡 Higher Priority"
+                return "🟡 HIGH PRIORITY"
             case "3":
-                return "🟢 Normal Priority"
+                return "🟢 STANDARD"
             default:
-                return "⚪ No Priority"
+                return "⚪ NO PRIORITY"
         }
     }
+
+    const remainingChars = CHARACTER_LIMIT - value.length
+    const isNearLimit = remainingChars <= 10
+    const canSubmit = value.trim() && value.trim().length <= CHARACTER_LIMIT
 
     return (
         <form className="ToDoForm" onSubmit={handleSubmit}>
             <div className="form-row">
-                <input
-                    type="text"
-                    className="todo-input"
-                    value={value}
-                    placeholder="What is the task today?"
-                    onChange={(e) => setValue(e.target.value)}
-                    disabled={loading}
-                />
+                <div className="input-container">
+                    <input
+                        type="text"
+                        className={`todo-input ${isNearLimit ? "input-warning" : ""}`}
+                        value={value}
+                        placeholder="What is your mission today?"
+                        onChange={handleInputChange}
+                        disabled={loading}
+                        maxLength={CHARACTER_LIMIT + 10} // Allow typing beyond limit for better UX
+                    />
+                    <div className="input-footer">
+                        <div className={`character-count ${isNearLimit ? "count-warning" : ""}`}>
+                            {value.length}/{CHARACTER_LIMIT}
+                        </div>
+                    </div>
+                </div>
 
                 <select
                     className="priority-select"
@@ -67,18 +90,25 @@ const ToDoForm = () => {
                     onChange={(e) => setPriority(e.target.value)}
                     disabled={loading}
                 >
-                    <option value="">⚪ No Priority</option>
-                    <option value="1">🔴 Urgent</option>
-                    <option value="2">🟡 Higher Priority</option>
-                    <option value="3">🟢 Normal Priority</option>
+                    <option value="">⚪ NO PRIORITY</option>
+                    <option value="1">🔴 URGENT</option>
+                    <option value="2">🟡 HIGH PRIORITY</option>
+                    <option value="3">🟢 STANDARD</option>
                 </select>
 
-                <button type="submit" className="todo-btn" disabled={loading || !value.trim()}>
-                    {loading ? "⏳ Adding..." : "Add task"}
-                </button>
+                <SuperheroButton
+                    type="submit"
+                    variant="primary"
+                    size="medium"
+                    disabled={loading || !canSubmit}
+                    loading={loading}
+                    icon={faRocket}
+                >
+                    {loading ? "DEPLOYING..." : "DEPLOY MISSION"}
+                </SuperheroButton>
             </div>
 
-            {priority && <div className="priority-preview">Selected: {getPriorityLabel(priority)}</div>}
+            {priority && <div className="priority-preview">Mission Priority: {getPriorityLabel(priority)}</div>}
         </form>
     )
 }
