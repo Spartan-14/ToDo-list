@@ -2,10 +2,9 @@
 import { useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faPenToSquare, faTrash, faCheck, faUndo } from "@fortawesome/free-solid-svg-icons"
+import { faPenToSquare, faTrash, faCheck } from "@fortawesome/free-solid-svg-icons"
 import { toggleCompleteAsync, softDeleteTodoAsync, editTodoAsync } from "./store/todoSlice"
 import DeleteConfirmModal from "./components/DeleteConfirmModal"
-import PriorityOrb from "./components/PriorityOrb"
 
 const Todo = ({ task }) => {
     const dispatch = useDispatch()
@@ -14,7 +13,6 @@ const Todo = ({ task }) => {
     const [isDeleting, setIsDeleting] = useState(false)
 
     const handleComplete = async () => {
-        console.log("🔄 Toggling complete for todo:", task.id)
         try {
             await dispatch(
                 toggleCompleteAsync({
@@ -22,19 +20,16 @@ const Todo = ({ task }) => {
                     completed: task.completed,
                 }),
             ).unwrap()
-            console.log("✅ Todo completion toggled successfully")
         } catch (error) {
-            console.error("❌ Failed to toggle todo completion:", error)
+            console.error("Failed to toggle todo completion:", error)
         }
     }
 
     const handleEdit = async () => {
-        console.log("🔄 Setting edit mode for todo:", task.id)
         try {
             await dispatch(editTodoAsync(task.id)).unwrap()
-            console.log("✅ Edit mode set successfully")
         } catch (error) {
-            console.error("❌ Failed to set edit mode:", error)
+            console.error("Failed to set edit mode:", error)
         }
     }
 
@@ -44,13 +39,11 @@ const Todo = ({ task }) => {
 
     const handleDeleteConfirm = async () => {
         setIsDeleting(true)
-        console.log("🔄 Soft deleting todo:", task.id)
         try {
             await dispatch(softDeleteTodoAsync(task.id)).unwrap()
-            console.log("✅ Todo soft deleted successfully")
             setShowDeleteModal(false)
         } catch (error) {
-            console.error("❌ Failed to soft delete todo:", error)
+            console.error("Failed to delete todo:", error)
         } finally {
             setIsDeleting(false)
         }
@@ -76,54 +69,62 @@ const Todo = ({ task }) => {
     const getPriorityLabel = (priority) => {
         switch (priority) {
             case 1:
-                return "URGENT MISSION"
+                return "High"
             case 2:
-                return "HIGH PRIORITY"
+                return "Medium"
             case 3:
-                return "STANDARD OPS"
+                return "Low"
             default:
-                return "ROUTINE TASK"
+                return null
         }
+    }
+
+    const getPriorityBadgeClass = (priority) => {
+        switch (priority) {
+            case 1:
+                return "priority-badge urgent"
+            case 2:
+                return "priority-badge higher"
+            case 3:
+                return "priority-badge normal"
+            default:
+                return ""
+        }
+    }
+
+    const formatDate = (timestamp) => {
+        if (!timestamp) return ""
+        const date = new Date(timestamp)
+        return date.toLocaleDateString()
     }
 
     return (
         <>
             <div className={`Todo ${task.completed ? "completed-task" : ""} ${getPriorityClass(task.priority)}`}>
-                <div className="todo-content">
-                    <div className="todo-header">
-                        {task.priority && <PriorityOrb priority={task.priority} size="medium" animated={true} />}
-                        <p className={`task-text ${task.completed ? "completed" : "incompleted"}`}>{task.task}</p>
-                    </div>
+                <div className={`todo-checkbox ${task.completed ? "completed" : ""}`} onClick={handleComplete}>
+                    {task.completed && <FontAwesomeIcon icon={faCheck} size="sm" />}
+                </div>
 
-                    {task.priority && (
-                        <div className="priority-label">
-                            <small>{getPriorityLabel(task.priority)}</small>
+                <div className="todo-content">
+                    <div className={`task-text ${task.completed ? "completed" : ""}`}>{task.task}</div>
+
+                    {(task.priority || task.created_at) && (
+                        <div className="task-meta">
+                            {task.priority && (
+                                <span className={getPriorityBadgeClass(task.priority)}>{getPriorityLabel(task.priority)} Priority</span>
+                            )}
+                            {task.created_at && <span className="task-date">Created {formatDate(task.created_at)}</span>}
                         </div>
                     )}
                 </div>
 
                 <div className="todo-actions">
-                    <FontAwesomeIcon
-                        className={`complete-icon ${task.completed ? "completed-btn" : "incomplete-btn"}`}
-                        icon={task.completed ? faUndo : faCheck}
-                        onClick={handleComplete}
-                        title={task.completed ? "REACTIVATE MISSION" : "COMPLETE MISSION"}
-                        style={{ opacity: loading ? 0.5 : 1 }}
-                    />
-                    <FontAwesomeIcon
-                        className="edit-icon"
-                        icon={faPenToSquare}
-                        onClick={handleEdit}
-                        title="MODIFY MISSION"
-                        style={{ opacity: loading ? 0.5 : 1 }}
-                    />
-                    <FontAwesomeIcon
-                        className="delete-icon"
-                        icon={faTrash}
-                        onClick={handleDeleteClick}
-                        title="ABORT MISSION"
-                        style={{ opacity: loading ? 0.5 : 1 }}
-                    />
+                    <button className="action-btn edit" onClick={handleEdit} title="Edit task" disabled={loading}>
+                        <FontAwesomeIcon icon={faPenToSquare} size="sm" />
+                    </button>
+                    <button className="action-btn delete" onClick={handleDeleteClick} title="Delete task" disabled={loading}>
+                        <FontAwesomeIcon icon={faTrash} size="sm" />
+                    </button>
                 </div>
             </div>
 

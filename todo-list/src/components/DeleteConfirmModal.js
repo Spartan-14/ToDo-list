@@ -1,7 +1,6 @@
 "use client"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faTrash, faExclamationTriangle, faTimes } from "@fortawesome/free-solid-svg-icons"
-import SuperheroButton from "./SuperheroButton"
+import { faTrash, faExclamationTriangle } from "@fortawesome/free-solid-svg-icons"
 
 const DeleteConfirmModal = ({ isOpen, onClose, onConfirm, taskName, loading }) => {
     if (!isOpen) return null
@@ -10,38 +9,27 @@ const DeleteConfirmModal = ({ isOpen, onClose, onConfirm, taskName, loading }) =
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal-container" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
-                    <div className="modal-icon-container">
-                        <FontAwesomeIcon icon={faExclamationTriangle} className="modal-warning-icon" />
+                    <div className="modal-icon">
+                        <FontAwesomeIcon icon={faExclamationTriangle} />
                     </div>
-                    <button className="modal-close-btn" onClick={onClose}>
-                        <FontAwesomeIcon icon={faTimes} />
-                    </button>
                 </div>
 
                 <div className="modal-content">
-                    <h3 className="modal-title">ABORT MISSION</h3>
+                    <h3 className="modal-title">Delete Task</h3>
                     <p className="modal-message">
-                        Are you sure you want to abort <strong>"{taskName}"</strong>?
+                        Are you sure you want to delete <strong>"{taskName}"</strong>?
                     </p>
-                    <p className="modal-submessage">
-                        This mission will be moved to the archive and can be restored within 30 days.
-                    </p>
+                    <p className="modal-submessage">This action cannot be undone.</p>
                 </div>
 
                 <div className="modal-actions">
-                    <SuperheroButton variant="secondary" size="medium" onClick={onClose} disabled={loading}>
-                        CANCEL
-                    </SuperheroButton>
-                    <SuperheroButton
-                        variant="danger"
-                        size="medium"
-                        onClick={onConfirm}
-                        disabled={loading}
-                        loading={loading}
-                        icon={faTrash}
-                    >
-                        {loading ? "ABORTING..." : "ABORT MISSION"}
-                    </SuperheroButton>
+                    <button className="btn btn-secondary" onClick={onClose} disabled={loading}>
+                        Cancel
+                    </button>
+                    <button className="btn btn-danger" onClick={onConfirm} disabled={loading}>
+                        {loading ? <div className="loading-spinner"></div> : <FontAwesomeIcon icon={faTrash} />}
+                        {loading ? "Deleting..." : "Delete Task"}
+                    </button>
                 </div>
             </div>
         </div>

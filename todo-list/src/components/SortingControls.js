@@ -30,7 +30,7 @@ const SortingControls = () => {
     const sortOptions = [
         { value: "priority", label: "Priority", icon: faExclamationTriangle },
         { value: "dateCreated", label: "Date Created", icon: faCalendarAlt },
-        { value: "dateModified", label: "Date Modified", icon: faEdit },
+        { value: "dateModified", label: "Date Modified", icon: faCalendarAlt },
         { value: "name", label: "Name", icon: faFont },
     ]
 

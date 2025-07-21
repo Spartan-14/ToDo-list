@@ -2,41 +2,34 @@
 
 import { useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import { faRocket } from "@fortawesome/free-solid-svg-icons"
-import SuperheroButton from "./components/SuperheroButton"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faPlus } from "@fortawesome/free-solid-svg-icons"
 import { addTodoAsync } from "./store/todoSlice"
 
 const ToDoForm = () => {
     const [value, setValue] = useState("")
-    const [priority, setPriority] = useState("") // Empty string for no priority
+    const [priority, setPriority] = useState("")
     const dispatch = useDispatch()
     const { loading } = useSelector((state) => state.todos)
 
-    const CHARACTER_LIMIT = 50
+    const CHARACTER_LIMIT = 100
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-        console.log("🔄 Form: Submit triggered with value:", value, "priority:", priority)
 
         if (value.trim() && value.trim().length <= CHARACTER_LIMIT) {
-            console.log("🔄 Form: Dispatching addTodoAsync...")
-
             const todoData = {
                 task: value.trim(),
-                priority: priority === "" ? null : Number.parseInt(priority), // Convert to int or null
+                priority: priority === "" ? null : Number.parseInt(priority),
             }
 
             try {
                 await dispatch(addTodoAsync(todoData)).unwrap()
-                console.log("✅ Form: Todo added successfully, clearing form...")
                 setValue("")
                 setPriority("")
             } catch (error) {
-                console.error("❌ Form: Add todo failed:", error)
-                // Error is handled by Redux state and displayed in ToDoWrapper
+                console.error("Failed to add todo:", error)
             }
-        } else {
-            console.log("⚠️ Form: Invalid input - empty or too long")
         }
     }
 
@@ -47,21 +40,8 @@ const ToDoForm = () => {
         }
     }
 
-    const getPriorityLabel = (priorityValue) => {
-        switch (priorityValue) {
-            case "1":
-                return "🔴 URGENT"
-            case "2":
-                return "🟡 HIGH PRIORITY"
-            case "3":
-                return "🟢 STANDARD"
-            default:
-                return "⚪ NO PRIORITY"
-        }
-    }
-
     const remainingChars = CHARACTER_LIMIT - value.length
-    const isNearLimit = remainingChars <= 10
+    const isNearLimit = remainingChars <= 20
     const canSubmit = value.trim() && value.trim().length <= CHARACTER_LIMIT
 
     return (
@@ -72,10 +52,9 @@ const ToDoForm = () => {
                         type="text"
                         className={`todo-input ${isNearLimit ? "input-warning" : ""}`}
                         value={value}
-                        placeholder="What is your mission today?"
+                        placeholder="What needs to be done?"
                         onChange={handleInputChange}
                         disabled={loading}
-                        maxLength={CHARACTER_LIMIT + 10} // Allow typing beyond limit for better UX
                     />
                     <div className="input-footer">
                         <div className={`character-count ${isNearLimit ? "count-warning" : ""}`}>
@@ -90,25 +69,17 @@ const ToDoForm = () => {
                     onChange={(e) => setPriority(e.target.value)}
                     disabled={loading}
                 >
-                    <option value="">⚪ NO PRIORITY</option>
-                    <option value="1">🔴 URGENT</option>
-                    <option value="2">🟡 HIGH PRIORITY</option>
-                    <option value="3">🟢 STANDARD</option>
+                    <option value="">No Priority</option>
+                    <option value="1">High Priority</option>
+                    <option value="2">Medium Priority</option>
+                    <option value="3">Low Priority</option>
                 </select>
 
-                <SuperheroButton
-                    type="submit"
-                    variant="primary"
-                    size="medium"
-                    disabled={loading || !canSubmit}
-                    loading={loading}
-                    icon={faRocket}
-                >
-                    {loading ? "DEPLOYING..." : "DEPLOY MISSION"}
-                </SuperheroButton>
+                <button type="submit" className="btn btn-primary" disabled={loading || !canSubmit}>
+                    {loading ? <div className="loading-spinner"></div> : <FontAwesomeIcon icon={faPlus} />}
+                    {loading ? "Adding..." : "Add Task"}
+                </button>
             </div>
-
-            {priority && <div className="priority-preview">Mission Priority: {getPriorityLabel(priority)}</div>}
         </form>
     )
 }
