@@ -3,7 +3,7 @@ import { supabase } from "./client"
 // Get all todos (including soft-deleted for admin purposes)
 export const getTodos = async (includeDeleted = false) => {
     try {
-        console.log("🔄 API: Fetching todos from Supabase...")
+        console.log("API: Fetching todos from Supabase...")
 
         let query = supabase.from("todos").select("*")
 
@@ -15,11 +15,11 @@ export const getTodos = async (includeDeleted = false) => {
         const { data, error } = await query.order("created_at", { ascending: false })
 
         if (error) {
-            console.error("❌ API: Fetch todos error:", error)
+            console.error("API: Fetch todos error:", error)
             throw error
         }
 
-        console.log("✅ API: Raw todos from Supabase:", data)
+        console.log("API: Raw todos from Supabase:", data)
 
         // Transform data to match your app's expected format
         const transformedTodos = data.map((todo) => ({
@@ -34,10 +34,10 @@ export const getTodos = async (includeDeleted = false) => {
             deleted_at: todo.deleted_at,
         }))
 
-        console.log("✅ API: Transformed todos:", transformedTodos)
+        console.log("API: Transformed todos:", transformedTodos)
         return transformedTodos
     } catch (error) {
-        console.error("❌ API: getTodos failed:", error)
+        console.error("API: getTodos failed:", error)
         throw error
     }
 }
@@ -45,7 +45,7 @@ export const getTodos = async (includeDeleted = false) => {
 // Add a new todo with priority
 export const addTodo = async (todoData) => {
     try {
-        console.log("🔄 API: Adding todo:", todoData)
+        console.log("API: Adding todo:", todoData)
 
         const now = new Date().toISOString()
 
@@ -64,14 +64,14 @@ export const addTodo = async (todoData) => {
             .select()
 
         if (error) {
-            console.error("❌ API: Add todo error:", error)
+            console.error("API: Add todo error:", error)
             throw error
         }
 
-        console.log("✅ API: Todo added successfully:", data[0])
+        console.log("API: Todo added successfully:", data[0])
         return data[0]
     } catch (error) {
-        console.error("❌ API: addTodo failed:", error)
+        console.error("API: addTodo failed:", error)
         throw error
     }
 }
@@ -79,7 +79,7 @@ export const addTodo = async (todoData) => {
 // Update todo (including priority and updated_at)
 export const updateTodo = async (id, updates) => {
     try {
-        console.log("🔄 API: Updating todo:", id, updates)
+        console.log("API: Updating todo:", id, updates)
 
         const updatesWithTimestamp = {
             ...updates,
@@ -89,14 +89,14 @@ export const updateTodo = async (id, updates) => {
         const { data, error } = await supabase.from("todos").update(updatesWithTimestamp).eq("id", id).select()
 
         if (error) {
-            console.error("❌ API: Update todo error:", error)
+            console.error("API: Update todo error:", error)
             throw error
         }
 
-        console.log("✅ API: Todo updated successfully:", data[0])
+        console.log("API: Todo updated successfully:", data[0])
         return data[0]
     } catch (error) {
-        console.error("❌ API: updateTodo failed:", error)
+        console.error("API: updateTodo failed:", error)
         throw error
     }
 }
@@ -104,7 +104,7 @@ export const updateTodo = async (id, updates) => {
 // NEW: Soft delete todo
 export const softDeleteTodo = async (id) => {
     try {
-        console.log("🔄 API: Soft deleting todo:", id)
+        console.log("API: Soft deleting todo:", id)
 
         const now = new Date().toISOString()
 
@@ -119,14 +119,14 @@ export const softDeleteTodo = async (id) => {
             .select()
 
         if (error) {
-            console.error("❌ API: Soft delete todo error:", error)
+            console.error("API: Soft delete todo error:", error)
             throw error
         }
 
-        console.log("✅ API: Todo soft deleted successfully:", data[0])
+        console.log("API: Todo soft deleted successfully:", data[0])
         return data[0]
     } catch (error) {
-        console.error("❌ API: softDeleteTodo failed:", error)
+        console.error("API: softDeleteTodo failed:", error)
         throw error
     }
 }
@@ -134,7 +134,7 @@ export const softDeleteTodo = async (id) => {
 // NEW: Restore soft-deleted todo
 export const restoreTodo = async (id) => {
     try {
-        console.log("🔄 API: Restoring todo:", id)
+        console.log("API: Restoring todo:", id)
 
         const now = new Date().toISOString()
 
@@ -149,14 +149,14 @@ export const restoreTodo = async (id) => {
             .select()
 
         if (error) {
-            console.error("❌ API: Restore todo error:", error)
+            console.error("API: Restore todo error:", error)
             throw error
         }
 
-        console.log("✅ API: Todo restored successfully:", data[0])
+        console.log("API: Todo restored successfully:", data[0])
         return data[0]
     } catch (error) {
-        console.error("❌ API: restoreTodo failed:", error)
+        console.error("API: restoreTodo failed:", error)
         throw error
     }
 }
@@ -164,19 +164,19 @@ export const restoreTodo = async (id) => {
 // NEW: Permanently delete todo (hard delete)
 export const permanentlyDeleteTodo = async (id) => {
     try {
-        console.log("🔄 API: Permanently deleting todo:", id)
+        console.log("API: Permanently deleting todo:", id)
 
         const { error } = await supabase.from("todos").delete().eq("id", id)
 
         if (error) {
-            console.error("❌ API: Permanent delete todo error:", error)
+            console.error("API: Permanent delete todo error:", error)
             throw error
         }
 
-        console.log("✅ API: Todo permanently deleted:", id)
+        console.log("API: Todo permanently deleted:", id)
         return true
     } catch (error) {
-        console.error("❌ API: permanentlyDeleteTodo failed:", error)
+        console.error("API: permanentlyDeleteTodo failed:", error)
         throw error
     }
 }
@@ -193,14 +193,14 @@ export const getDeletedTodos = async () => {
             .order("deleted_at", { ascending: false })
 
         if (error) {
-            console.error("❌ API: Fetch deleted todos error:", error)
+            console.error("API: Fetch deleted todos error:", error)
             throw error
         }
 
-        console.log("✅ API: Deleted todos fetched:", data)
+        console.log("API: Deleted todos fetched:", data)
         return data
     } catch (error) {
-        console.error("❌ API: getDeletedTodos failed:", error)
+        console.error("API: getDeletedTodos failed:", error)
         throw error
     }
 }

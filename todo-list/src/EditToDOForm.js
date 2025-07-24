@@ -3,7 +3,14 @@
 import { useState, useEffect, useRef } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faSave, faTimes, faExclamationTriangle, faPenToSquare } from "@fortawesome/free-solid-svg-icons"
+import {
+    faSave,
+    faTimes,
+    faExclamationTriangle,
+    faPenToSquare,
+    faFlag,
+    faCircle,
+} from "@fortawesome/free-solid-svg-icons"
 import { updateTodoAsync, cancelEditTodoAsync } from "./store/todoSlice"
 
 const EditToDoForm = ({ task }) => {
@@ -91,6 +98,19 @@ const EditToDoForm = ({ task }) => {
         }
     }
 
+    const getPriorityConfig = (priorityValue) => {
+        switch (priorityValue) {
+            case "1":
+                return { icon: faExclamationTriangle, color: "#dc3545" }
+            case "2":
+                return { icon: faFlag, color: "#e87722" }
+            case "3":
+                return { icon: faCircle, color: "#f5cb5c" }
+            default:
+                return { icon: faCircle, color: "#597b96" }
+        }
+    }
+
     const remainingChars = CHARACTER_LIMIT - value.length
     const isOverLimit = value.length > CHARACTER_LIMIT
     const isNearLimit = remainingChars <= 20
@@ -130,17 +150,27 @@ const EditToDoForm = ({ task }) => {
                         </div>
                     </div>
 
-                    <select
-                        className="priority-select"
-                        value={priority}
-                        onChange={(e) => setPriority(e.target.value)}
-                        disabled={loading}
-                    >
-                        <option value="">No Priority</option>
-                        <option value="1">High Priority</option>
-                        <option value="2">Medium Priority</option>
-                        <option value="3">Low Priority</option>
-                    </select>
+                    <div className="priority-select-wrapper">
+                        <select
+                            className="priority-select enhanced"
+                            value={priority}
+                            onChange={(e) => setPriority(e.target.value)}
+                            disabled={loading}
+                        >
+                            <option value="">No Priority</option>
+                            <option value="1">High Priority</option>
+                            <option value="2">Medium Priority</option>
+                            <option value="3">Low Priority</option>
+                        </select>
+
+                        <div className="priority-icon-display">
+                            <FontAwesomeIcon
+                                icon={getPriorityConfig(priority).icon}
+                                style={{ color: getPriorityConfig(priority).color }}
+                                className="priority-visual-icon"
+                            />
+                        </div>
+                    </div>
 
                     <button type="submit" className="btn btn-success" disabled={loading || !canSave}>
                         {loading ? <div className="loading-spinner"></div> : <FontAwesomeIcon icon={faSave} />}

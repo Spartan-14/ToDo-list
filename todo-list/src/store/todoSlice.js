@@ -264,12 +264,12 @@ const todoSlice = createSlice({
         builder
             // Fetch todos
             .addCase(fetchTodos.pending, (state) => {
-                console.log("🔄 Redux: Fetch todos pending...")
+                console.log("Redux: Fetch todos pending...")
                 state.loading = true
                 state.error = null
             })
             .addCase(fetchTodos.fulfilled, (state, action) => {
-                console.log("✅ Redux: Fetch todos fulfilled:", action.payload)
+                console.log("Redux: Fetch todos fulfilled:", action.payload)
                 state.loading = false
                 state.todos = action.payload.todos
                 state.processedTodos = action.payload.processedTodos
@@ -278,7 +278,7 @@ const todoSlice = createSlice({
                 state.error = null
             })
             .addCase(fetchTodos.rejected, (state, action) => {
-                console.error("❌ Redux: Fetch todos rejected:", action.payload)
+                console.error("Redux: Fetch todos rejected:", action.payload)
                 state.loading = false
                 state.error = action.payload
                 state.initialized = true

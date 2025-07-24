@@ -26,10 +26,10 @@ export const testConnection = async () => {
             console.error("Connection test failed:", error)
             return false
         }
-        console.log("✅ Supabase connection successful")
+        console.log("Supabase connection successful")
         return true
     } catch (err) {
-        console.error("❌ Supabase connection failed:", err)
+        console.error("Supabase connection failed:", err)
         return false
     }
 }

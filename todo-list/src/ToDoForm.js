@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faPlus } from "@fortawesome/free-solid-svg-icons"
+import { faPlus, faExclamationTriangle, faFlag, faCircle } from "@fortawesome/free-solid-svg-icons"
 import { addTodoAsync } from "./store/todoSlice"
 
 const ToDoForm = () => {
@@ -44,13 +44,28 @@ const ToDoForm = () => {
     const isNearLimit = remainingChars <= 20
     const canSubmit = value.trim() && value.trim().length <= CHARACTER_LIMIT
 
+    const getPriorityConfig = (priorityValue) => {
+        switch (priorityValue) {
+            case "1":
+                return { icon: faExclamationTriangle, color: "#dc3545", label: "High Priority" }
+            case "2":
+                return { icon: faFlag, color: "#e87722", label: "Medium Priority" }
+            case "3":
+                return { icon: faCircle, color: "#f5cb5c", label: "Low Priority" }
+            default:
+                return { icon: faCircle, color: "#597b96", label: "No Priority" }
+        }
+    }
+
+    const currentPriorityConfig = getPriorityConfig(priority)
+
     return (
-        <form className="ToDoForm" onSubmit={handleSubmit}>
+        <form className="ToDoForm enhanced" onSubmit={handleSubmit}>
             <div className="form-row">
-                <div className="input-container">
+                <div className="input-container enhanced">
                     <input
                         type="text"
-                        className={`todo-input ${isNearLimit ? "input-warning" : ""}`}
+                        className={`todo-input enhanced ${isNearLimit ? "input-warning" : ""}`}
                         value={value}
                         placeholder="What needs to be done?"
                         onChange={handleInputChange}
@@ -63,21 +78,45 @@ const ToDoForm = () => {
                     </div>
                 </div>
 
-                <select
-                    className="priority-select"
-                    value={priority}
-                    onChange={(e) => setPriority(e.target.value)}
-                    disabled={loading}
-                >
-                    <option value="">No Priority</option>
-                    <option value="1">High Priority</option>
-                    <option value="2">Medium Priority</option>
-                    <option value="3">Low Priority</option>
-                </select>
+                <div className="priority-select-wrapper enhanced">
+                    <select
+                        className="priority-select enhanced"
+                        value={priority}
+                        onChange={(e) => setPriority(e.target.value)}
+                        disabled={loading}
+                    >
+                        <option value="" data-icon="faCircle" data-color="#597b96">
+                            ⚪ No Priority
+                        </option>
+                        <option value="1" data-icon="faExclamationTriangle" data-color="#dc3545">
+                            🔴 High Priority
+                        </option>
+                        <option value="2" data-icon="faFlag" data-color="#e87722">
+                            🟠 Medium Priority
+                        </option>
+                        <option value="3" data-icon="faCircle" data-color="#f5cb5c">
+                            🟡 Low Priority
+                        </option>
+                    </select>
 
-                <button type="submit" className="btn btn-primary" disabled={loading || !canSubmit}>
-                    {loading ? <div className="loading-spinner"></div> : <FontAwesomeIcon icon={faPlus} />}
-                    {loading ? "Adding..." : "Add Task"}
+                    <div className="priority-icon-display">
+                        <FontAwesomeIcon
+                            icon={currentPriorityConfig.icon}
+                            style={{ color: currentPriorityConfig.color }}
+                            className="priority-visual-icon"
+                        />
+                    </div>
+
+                    {priority && <div className="priority-tooltip">{currentPriorityConfig.label}</div>}
+                </div>
+
+                <button type="submit" className="btn btn-primary enhanced" disabled={loading || !canSubmit}>
+                    {loading ? (
+                        <div className="loading-spinner enhanced"></div>
+                    ) : (
+                        <FontAwesomeIcon icon={faPlus} className="btn-icon" />
+                    )}
+                    <span className="btn-text">{loading ? "Adding..." : "Add Task"}</span>
                 </button>
             </div>
         </form>

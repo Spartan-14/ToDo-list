@@ -2,7 +2,14 @@
 import { useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faPenToSquare, faTrash, faCheck } from "@fortawesome/free-solid-svg-icons"
+import {
+    faPenToSquare,
+    faTrash,
+    faCheck,
+    faExclamationTriangle,
+    faFlag,
+    faCircle,
+} from "@fortawesome/free-solid-svg-icons"
 import { toggleCompleteAsync, softDeleteTodoAsync, editTodoAsync } from "./store/todoSlice"
 import DeleteConfirmModal from "./components/DeleteConfirmModal"
 
@@ -53,14 +60,27 @@ const Todo = ({ task }) => {
         setShowDeleteModal(false)
     }
 
-    const getPriorityClass = (priority) => {
+    const getPriorityIcon = (priority) => {
         switch (priority) {
             case 1:
-                return "priority-urgent"
+                return faExclamationTriangle
             case 2:
-                return "priority-higher"
+                return faFlag
             case 3:
-                return "priority-normal"
+                return faCircle
+            default:
+                return null
+        }
+    }
+
+    const getPriorityIconClass = (priority) => {
+        switch (priority) {
+            case 1:
+                return "priority-icon priority-icon--urgent"
+            case 2:
+                return "priority-icon priority-icon--medium"
+            case 3:
+                return "priority-icon priority-icon--low"
             default:
                 return ""
         }
@@ -100,13 +120,22 @@ const Todo = ({ task }) => {
 
     return (
         <>
-            <div className={`Todo ${task.completed ? "completed-task" : ""} ${getPriorityClass(task.priority)}`}>
+            <div className={`Todo ${task.completed ? "completed-task" : ""} `}>
                 <div className={`todo-checkbox ${task.completed ? "completed" : ""}`} onClick={handleComplete}>
                     {task.completed && <FontAwesomeIcon icon={faCheck} size="sm" />}
                 </div>
 
                 <div className="todo-content">
-                    <div className={`task-text ${task.completed ? "completed" : ""}`}>{task.task}</div>
+                    <div className="task-header">
+                        {task.priority && (
+                            <FontAwesomeIcon
+                                icon={getPriorityIcon(task.priority)}
+                                className={getPriorityIconClass(task.priority)}
+                                title={getPriorityLabel(task.priority) + " Priority"}
+                            />
+                        )}
+                        <div className={`task-text ${task.completed ? "completed" : ""}`}>{task.task}</div>
+                    </div>
 
                     {(task.priority || task.created_at) && (
                         <div className="task-meta">

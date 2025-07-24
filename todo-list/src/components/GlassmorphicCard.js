@@ -1,6 +1,13 @@
 "use client"
 
-const GlassmorphicCard = ({ children, className = "", variant = "default", elevation = "medium", ...props }) => {
+const GlassmorphicCard = ({
+                              children,
+                              className = "",
+                              variant = "default",
+                              elevation = "medium",
+                              blur = "medium",
+                              ...props
+                          }) => {
     const getVariantStyles = () => {
         switch (variant) {
             case "hero":
@@ -9,6 +16,10 @@ const GlassmorphicCard = ({ children, className = "", variant = "default", eleva
                 return "glassmorphic-card glassmorphic-card--priority"
             case "action":
                 return "glassmorphic-card glassmorphic-card--action"
+            case "form":
+                return "glassmorphic-card glassmorphic-card--form"
+            case "stats":
+                return "glassmorphic-card glassmorphic-card--stats"
             default:
                 return "glassmorphic-card"
         }
@@ -27,8 +38,19 @@ const GlassmorphicCard = ({ children, className = "", variant = "default", eleva
         }
     }
 
+    const getBlurClass = () => {
+        switch (blur) {
+            case "light":
+                return "blur-light"
+            case "heavy":
+                return "blur-heavy"
+            default:
+                return "blur-medium"
+        }
+    }
+
     return (
-        <div className={`${getVariantStyles()} ${getElevationClass()} ${className}`} {...props}>
+        <div className={`${getVariantStyles()} ${getElevationClass()} ${getBlurClass()} ${className}`} {...props}>
             <div className="glassmorphic-content">{children}</div>
         </div>
     )

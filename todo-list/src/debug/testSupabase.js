@@ -39,9 +39,9 @@ export const runSupabaseTests = async () => {
             console.log("Delete result:", deleteResult)
         }
 
-        console.log("✅ All tests completed successfully!")
+        console.log("All tests completed successfully!")
     } catch (error) {
-        console.error("❌ Test failed:", error)
+        console.error("Test failed:", error)
     }
 }
 

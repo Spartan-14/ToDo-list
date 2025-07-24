@@ -10,10 +10,10 @@ import {
     faLayerGroup,
     faChevronDown,
     faCalendarAlt,
-    faEdit,
     faFont,
-    faExclamationTriangle,
     faBars,
+    faFlag,
+    faClock,
 } from "@fortawesome/free-solid-svg-icons"
 import { setSortBy, setGroupBy, toggleSortOrder } from "../store/todoSlice"
 
@@ -28,17 +28,17 @@ const SortingControls = () => {
     const groupDropdownRef = useRef(null)
 
     const sortOptions = [
-        { value: "priority", label: "Priority", icon: faExclamationTriangle },
+        { value: "priority", label: "Priority", icon: faFlag },
         { value: "dateCreated", label: "Date Created", icon: faCalendarAlt },
-        { value: "dateModified", label: "Date Modified", icon: faCalendarAlt },
+        { value: "dateModified", label: "Date Modified", icon: faClock },
         { value: "name", label: "Name", icon: faFont },
     ]
 
     const groupOptions = [
         { value: "none", label: "No Grouping", icon: faBars },
-        { value: "priority", label: "Priority", icon: faExclamationTriangle },
+        { value: "priority", label: "Priority", icon: faFlag },
         { value: "dateCreated", label: "Date Created", icon: faCalendarAlt },
-        { value: "dateModified", label: "Date Modified", icon: faEdit },
+        { value: "dateModified", label: "Date Modified", icon: faClock },
         { value: "name", label: "Name", icon: faFont },
     ]
 
@@ -53,8 +53,27 @@ const SortingControls = () => {
             }
         }
 
+        // Close dropdowns on scroll to prevent positioning issues
+        const handleScroll = () => {
+            setShowSortDropdown(false)
+            setShowGroupDropdown(false)
+        }
+
+        // Close dropdowns on window resize
+        const handleResize = () => {
+            setShowSortDropdown(false)
+            setShowGroupDropdown(false)
+        }
+
         document.addEventListener("mousedown", handleClickOutside)
-        return () => document.removeEventListener("mousedown", handleClickOutside)
+        window.addEventListener("scroll", handleScroll, true)
+        window.addEventListener("resize", handleResize)
+
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside)
+            window.removeEventListener("scroll", handleScroll, true)
+            window.removeEventListener("resize", handleResize)
+        }
     }, [])
 
     const handleSortSelect = (newSortBy) => {
@@ -79,6 +98,17 @@ const SortingControls = () => {
         return groupOptions.find((option) => option.value === groupBy) || groupOptions[0]
     }
 
+    // Add smart positioning logic
+    const handleSortToggle = () => {
+        setShowGroupDropdown(false) // Close other dropdown
+        setShowSortDropdown(!showSortDropdown)
+    }
+
+    const handleGroupToggle = () => {
+        setShowSortDropdown(false) // Close other dropdown
+        setShowGroupDropdown(!showGroupDropdown)
+    }
+
     return (
         <div className="sorting-toolbar">
             <div className="toolbar-section">
@@ -87,11 +117,7 @@ const SortingControls = () => {
                 <div className="toolbar-controls">
                     {/* Sort Dropdown */}
                     <div className="control-group" ref={sortDropdownRef}>
-                        <button
-                            className="toolbar-button sort-button"
-                            onClick={() => setShowSortDropdown(!showSortDropdown)}
-                            title="Sort by"
-                        >
+                        <button className="toolbar-button sort-button" onClick={handleSortToggle} title="Sort by">
                             <FontAwesomeIcon icon={faSort} className="button-icon" />
                             <span className="button-text">{getCurrentSortOption().label}</span>
                             <FontAwesomeIcon icon={faChevronDown} className="dropdown-arrow" />
@@ -126,11 +152,7 @@ const SortingControls = () => {
 
                     {/* Group Dropdown */}
                     <div className="control-group" ref={groupDropdownRef}>
-                        <button
-                            className="toolbar-button group-button"
-                            onClick={() => setShowGroupDropdown(!showGroupDropdown)}
-                            title="Group by"
-                        >
+                        <button className="toolbar-button group-button" onClick={handleGroupToggle} title="Group by">
                             <FontAwesomeIcon icon={faLayerGroup} className="button-icon" />
                             <span className="button-text">{getCurrentGroupOption().label}</span>
                             <FontAwesomeIcon icon={faChevronDown} className="dropdown-arrow" />
