@@ -13,7 +13,6 @@ const DeleteConfirmModal = ({ isOpen, onClose, onConfirm, taskName, loading }) =
                         <FontAwesomeIcon icon={faExclamationTriangle} />
                     </div>
                 </div>
-
                 <div className="modal-content">
                     <h3 className="modal-title">Delete Task</h3>
                     <p className="modal-message">
