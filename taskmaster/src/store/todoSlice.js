@@ -57,16 +57,16 @@ const sortTodos = (todos, sortBy, sortOrder, groupBy) => {
                 case "priority":
                     switch (todo.priority) {
                         case 1:
-                            groupKey = "🔴 Urgent"
+                            groupKey = "Urgent"
                             break
                         case 2:
-                            groupKey = "🟡 Higher Priority"
+                            groupKey = "Higher Priority"
                             break
                         case 3:
-                            groupKey = "🟢 Normal Priority"
+                            groupKey = "Normal Priority"
                             break
                         default:
-                            groupKey = "⚪ No Priority"
+                            groupKey = "No Priority"
                             break
                     }
                     break
@@ -89,9 +89,9 @@ const sortTodos = (todos, sortBy, sortOrder, groupBy) => {
 // Async thunks for Supabase operations
 export const fetchTodos = createAsyncThunk("todos/fetchTodos", async (_, { getState, rejectWithValue }) => {
     try {
-        console.log("🔄 Redux: Fetching todos from Supabase...")
+        console.log("Redux: Fetching todos from Supabase...")
         const todos = await todoApi.getTodos()
-        console.log("✅ Redux: Todos fetched successfully:", todos)
+        console.log("Redux: Todos fetched successfully:", todos)
 
         // Apply current sorting and grouping
         const { sortBy, sortOrder, groupBy } = getState().todos
@@ -99,22 +99,22 @@ export const fetchTodos = createAsyncThunk("todos/fetchTodos", async (_, { getSt
 
         return { todos, processedTodos }
     } catch (error) {
-        console.error("❌ Redux: Fetch todos failed:", error.message)
+        console.error("Redux: Fetch todos failed:", error.message)
         return rejectWithValue(error.message)
     }
 })
 
 export const addTodoAsync = createAsyncThunk("todos/addTodo", async (todoData, { dispatch, rejectWithValue }) => {
     try {
-        console.log("🔄 Redux: Adding todo:", todoData)
+        console.log("Redux: Adding todo:", todoData)
         const newTodo = await todoApi.addTodo(todoData)
-        console.log("✅ Redux: Todo added successfully:", newTodo)
+        console.log("Redux: Todo added successfully:", newTodo)
 
         // Fetch updated todos list after adding
         dispatch(fetchTodos())
         return newTodo
     } catch (error) {
-        console.error("❌ Redux: Add todo failed:", error.message)
+        console.error("Redux: Add todo failed:", error.message)
         return rejectWithValue(error.message)
     }
 })
@@ -123,14 +123,14 @@ export const toggleCompleteAsync = createAsyncThunk(
     "todos/toggleComplete",
     async ({ id, completed }, { dispatch, rejectWithValue }) => {
         try {
-            console.log("🔄 Redux: Toggling complete:", id, completed)
+            console.log("Redux: Toggling complete:", id, completed)
             const updatedTodo = await todoApi.toggleComplete(id, completed)
-            console.log("✅ Redux: Toggle complete successful:", updatedTodo)
+            console.log("Redux: Toggle complete successful:", updatedTodo)
 
             dispatch(fetchTodos())
             return updatedTodo
         } catch (error) {
-            console.error("❌ Redux: Toggle complete failed:", error.message)
+            console.error("Redux: Toggle complete failed:", error.message)
             return rejectWithValue(error.message)
         }
     },
@@ -140,19 +140,19 @@ export const updateTodoAsync = createAsyncThunk(
     "todos/updateTodo",
     async ({ id, task, priority }, { dispatch, rejectWithValue }) => {
         try {
-            console.log("🔄 Redux: Updating todo:", id, { task, priority })
+            console.log("Redux: Updating todo:", id, { task, priority })
             const updatedTodo = await todoApi.updateTodo(id, {
                 task,
                 priority: priority || null,
                 is_editing: false,
                 updated_at: new Date().toISOString(),
             })
-            console.log("✅ Redux: Update todo successful:", updatedTodo)
+            console.log("Redux: Update todo successful:", updatedTodo)
 
             dispatch(fetchTodos())
             return updatedTodo
         } catch (error) {
-            console.error("❌ Redux: Update todo failed:", error.message)
+            console.error("Redux: Update todo failed:", error.message)
             return rejectWithValue(error.message)
         }
     },
@@ -163,7 +163,7 @@ export const softDeleteTodoAsync = createAsyncThunk(
     "todos/softDeleteTodo",
     async (id, { dispatch, rejectWithValue }) => {
         try {
-            console.log("🔄 Redux: Soft deleting todo:", id)
+            console.log("Redux: Soft deleting todo:", id)
             await todoApi.softDeleteTodo(id)
             console.log("✅ Redux: Soft delete todo successful:", id)
 
@@ -179,28 +179,28 @@ export const softDeleteTodoAsync = createAsyncThunk(
 // NEW: Restore soft-deleted todo
 export const restoreTodoAsync = createAsyncThunk("todos/restoreTodo", async (id, { dispatch, rejectWithValue }) => {
     try {
-        console.log("🔄 Redux: Restoring todo:", id)
+        console.log("Redux: Restoring todo:", id)
         await todoApi.restoreTodo(id)
-        console.log("✅ Redux: Restore todo successful:", id)
+        console.log("Redux: Restore todo successful:", id)
 
         dispatch(fetchTodos())
         return id
     } catch (error) {
-        console.error("❌ Redux: Restore todo failed:", error.message)
+        console.error("Redux: Restore todo failed:", error.message)
         return rejectWithValue(error.message)
     }
 })
 
 export const editTodoAsync = createAsyncThunk("todos/editTodo", async (id, { dispatch, rejectWithValue }) => {
     try {
-        console.log("🔄 Redux: Setting edit mode:", id)
+        console.log("Redux: Setting edit mode:", id)
         const updatedTodo = await todoApi.setEditMode(id, true)
-        console.log("✅ Redux: Edit mode set:", updatedTodo)
+        console.log("Redux: Edit mode set:", updatedTodo)
 
         dispatch(fetchTodos())
         return updatedTodo
     } catch (error) {
-        console.error("❌ Redux: Set edit mode failed:", error.message)
+        console.error("Redux: Set edit mode failed:", error.message)
         return rejectWithValue(error.message)
     }
 })
@@ -210,14 +210,14 @@ export const cancelEditTodoAsync = createAsyncThunk(
     "todos/cancelEditTodo",
     async (id, { dispatch, rejectWithValue }) => {
         try {
-            console.log("🔄 Redux: Cancelling edit mode:", id)
+            console.log("Redux: Cancelling edit mode:", id)
             const updatedTodo = await todoApi.setEditMode(id, false)
-            console.log("✅ Redux: Edit mode cancelled:", updatedTodo)
+            console.log("Redux: Edit mode cancelled:", updatedTodo)
 
             dispatch(fetchTodos())
             return updatedTodo
         } catch (error) {
-            console.error("❌ Redux: Cancel edit mode failed:", error.message)
+            console.error("Redux: Cancel edit mode failed:", error.message)
             return rejectWithValue(error.message)
         }
     },

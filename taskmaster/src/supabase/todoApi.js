@@ -184,7 +184,7 @@ export const permanentlyDeleteTodo = async (id) => {
 // NEW: Get soft-deleted todos (for trash view)
 export const getDeletedTodos = async () => {
     try {
-        console.log("🔄 API: Fetching deleted todos...")
+        console.log("API: Fetching deleted todos...")
 
         const { data, error } = await supabase
             .from("todos")

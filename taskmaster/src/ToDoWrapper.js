@@ -25,7 +25,7 @@ const ToDoWrapper = () => {
 
     // Fetch todos when component mounts
     useEffect(() => {
-        console.log("🚀 ToDoWrapper: Component mounted, fetching todos...")
+        console.log("ToDoWrapper: Component mounted, fetching todos...")
         dispatch(fetchTodos())
     }, [dispatch])
 
